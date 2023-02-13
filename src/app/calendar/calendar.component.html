@@ -1,0 +1,55 @@
+<h3>Horarios {{ getYear() }}</h3>
+<table>
+    <thead>
+        <tr>
+            <th>
+              Modulo
+            </th>
+            <th *ngFor="let week of weeks[0]; let i = index">
+                 {{ days[week.getDay()] }}
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let modulo of modulos; index as i">
+          <td>
+            {{ i + 1}}
+          </td>
+           <td *ngFor="let weekDay of modulo ">
+               {{ weekDay }}
+           </td>
+      </tr>
+    </tbody>
+</table>
+
+<p-table [value]="mod.modulos" [columns]="mod.dias">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>
+        Modulo
+      </th>
+      <th *ngFor="let day of mod.dias; index as i">
+        {{ day }}
+      </th>
+      <!-- <th *ngFor="let week of weeks[0]; let i = index">
+           {{ days[week.getDay()] }}
+      </th> -->
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-modulo let-columns="columns">
+    <!-- <tr *ngFor="let modulo of mod.modulos"> -->
+    <tr>
+      <td>
+        {{ modulo }}
+      </td>
+      <td *ngFor="let col of columns; index as i">
+        {{ col }}
+      </td>
+    </tr>
+    <!-- <tr>
+        <td *ngFor="let mol of modulo; index as i">
+          {{modulo[i]}}
+        </td>
+    </tr> -->
+  </ng-template>
+</p-table>
