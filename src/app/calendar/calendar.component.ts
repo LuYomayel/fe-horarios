@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { HorariosService } from '../services/horarios.service';
-
+import { SelectItem } from 'primeng/api';
+import { CalendarOptions } from '@fullcalendar/core'; // useful for typechecking
+import timeGridPlugin from '@fullcalendar/timegrid'
+import interactionPlugin from '@fullcalendar/interaction'
+import esLocale from '@fullcalendar/core/locales/es';
 interface horarioSemanal {
   modulos: number[];
   dias: EDia[]
@@ -37,78 +41,82 @@ export class CalendarComponent implements OnInit {
     modulos: [1,2,3,4,5,6],
     dias: this.days
   }
-  currentYear? : number;
-
-  modulos: Array<any> = [
-    this.days,
-    this.days,
-    this.days,
-    this.days,
-    this.days,
-    this.days,
-  ]
 
 
-  weeks: Array<any> = [
-    [
-      new Date(2019, 11, 1),
-      new Date(2019, 11, 2),
-      new Date(2019, 11, 3),
-      new Date(2019, 11, 4),
-      new Date(2019, 11, 5),
-      new Date(2019, 11, 6),
-      new Date(2019, 11, 7)],
-    [
-      new Date(2019, 11, 8),
-      new Date(2019, 11, 9),
-      new Date(2019, 11, 10),
-      new Date(2019, 11, 11),
-      new Date(2019, 11, 12),
-      new Date(2019, 11, 13),
-      new Date(2019, 11, 14),
-    ],
-    [
-      new Date(2019, 11, 15),
-      new Date(2019, 11, 16),
-      new Date(2019, 11, 17),
-      new Date(2019, 11, 18),
-      new Date(2019, 11, 19),
-      new Date(2019, 11, 20),
-      new Date(2019, 11, 21),
-    ],
-    [
-      new Date(2019, 11, 22),
-      new Date(2019, 11, 23),
-      new Date(2019, 11, 24),
-      new Date(2019, 11, 25),
-      new Date(2019, 11, 26),
-      new Date(2019, 11, 27),
-      new Date(2019, 11, 28),
-    ],
-    [
-      new Date(2019, 11, 29),
-      new Date(2019, 11, 30),
-      new Date(2019, 11, 31),
-    ]
-  ]
+  events: any[] = [];
+  options!: CalendarOptions;
+  weekDays: SelectItem[] = [];
 
+  constructor(protected dataService: HorariosService){
 
-  constructor(protected horarioService: HorariosService) { }
+  }
 
   ngOnInit() {
-    const me = this;
-    me.horarioService.getHorarioXCurso().subscribe( result => console.log(result))
-  }
 
-  getMonth() {
-    return this.months[this.currentDate.getMonth()];
-  }
+    this.dataService.getHorarioXCurso().subscribe(result => this.events = result)
+    const newDate = new Date();
+    this.options = {
+      locale: esLocale,
+      plugins: [timeGridPlugin, interactionPlugin],
+      initialDate: `${newDate.getFullYear()}-05-01`,
+      initialView: 'timeGridWeek',
+      weekends: false,
+      slotDuration: '01:00',
+      slotMinTime: '01:00:00',
+      slotMaxTime: '7:00:00',
+      slotLabelFormat: {
+        hour: 'numeric',
+        meridiem: false
+      },
+      titleFormat: {
+        year: 'numeric',
+      },
+      dayHeaderFormat: {
+        weekday: 'short',
+      },
+      headerToolbar: {
+        start: 'title',
+        center: '',
+        end: ''
+      },
+      selectable: true,
+      timeZone: 'UTC',
+      dateClick: function(info) {
+        console.log('Date', new Date(info.dateStr).getUTCDate())
+        console.log('Month', new Date(info.dateStr).getUTCMonth())
+        console.log('Year', new Date(info.dateStr).getUTCFullYear())
+      },
+      nowIndicator: true,
+      eventClick: function(info) {
+        alert('Event: ' + info.event.title);
+        alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
+        alert('View: ' + info.view.type);
 
-  getFirstDay() {
-    return this.days[this.currentDate.getDay()];
-  }
+        // change the border color just for fun
+        info.el.style.borderColor = 'red';
+      }
+    };
+    console.log('Date: ', new Date(2023,4,1))
+    console.log(this.events)
+    // this.events = [
+    //   {
+    //     title: 'BCH237',
+    //     start: '2023-03-15T10:30:00',
+    //     end: '2023-03-15T11:30:00',
+    //     extendedProps: {
+    //       department: 'BioChemistry'
+    //     },
+    //     description: 'Lecture'
+    //   }
+    //   // more events ...
+    // ]
 
-  getYear() {
-    return this.currentDate.getFullYear();
+    this.weekDays = [
+      { label: 'Lunes', value: 1 },
+      { label: 'Martes', value: 2 },
+      { label: 'Miércoles', value: 3 },
+      { label: 'Jueves', value: 4 },
+      { label: 'Viernes', value: 5 }
+    ];
   }
 }

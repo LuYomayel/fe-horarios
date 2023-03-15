@@ -1,4 +1,4 @@
-<h3>Horarios {{ getYear() }}</h3>
+<!-- <h3>Horarios {{ getYear() }}</h3>
 <table>
     <thead>
         <tr>
@@ -31,13 +31,9 @@
       <th *ngFor="let day of mod.dias; index as i">
         {{ day }}
       </th>
-      <!-- <th *ngFor="let week of weeks[0]; let i = index">
-           {{ days[week.getDay()] }}
-      </th> -->
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-modulo let-columns="columns">
-    <!-- <tr *ngFor="let modulo of mod.modulos"> -->
     <tr>
       <td>
         {{ modulo }}
@@ -46,10 +42,16 @@
         {{ col }}
       </td>
     </tr>
-    <!-- <tr>
-        <td *ngFor="let mol of modulo; index as i">
-          {{modulo[i]}}
-        </td>
-    </tr> -->
   </ng-template>
-</p-table>
+</p-table> -->
+
+
+<h1>Calendario de horarios</h1>
+<div class="p-grid">
+  <div class="p-col-12">
+    <p-dropdown [options]="weekDays"></p-dropdown>
+  </div>
+  <div class="p-col-12">
+    <full-calendar [options]="options" [events]="events"></full-calendar>
+  </div>
+</div>

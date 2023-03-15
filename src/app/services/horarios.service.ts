@@ -4,7 +4,14 @@ import { HttpClient, HttpResponse, HttpHeaders , HttpRequest  } from '@angular/c
 import {map} from 'rxjs/operators';
 import { global } from "./global";
 import { Observable } from "rxjs";
-import { HorarioXCurso } from "../interfaces/horarios";
+import { EDia, HorarioXCurso } from "../interfaces/horarios";
+
+interface Event {
+  title?: string,
+  start?: string,
+  end?: string,
+  description?: string,
+}
 
 @Injectable()
 export class HorariosService{
@@ -16,11 +23,39 @@ export class HorariosService{
         this.url = global.url
     }
 
-    getHorarioXCurso(): Observable<HorarioXCurso[]>{
+    getDia(dia: EDia){
+      switch(dia){
+        case EDia.lunes:
+          return 1
+        case EDia.martes:
+          return 2
+        case EDia.miercoles:
+          return 3
+        case EDia.jueves:
+          return 4
+        case EDia.viernes:
+          return 5
+        default:
+          return -1;
+      }
+    }
+
+    getHorarioXCurso(): Observable<Event[]>{
         console.log(this.url)
         return this._http.get<HorarioXCurso[]>(`${this.url}horario-x-curso/curso/1/1`).pipe(
             map(
-                result => result
+                result => {
+                  const newArray: Event[] = result.map( horarioAsignado => {
+                    const newDate = new Date()
+                    return {
+                      title: horarioAsignado.materia.nombre,
+                      start: `2023-05-${this.getDia(horarioAsignado.horario.dia)}T0${horarioAsignado.horario.modulo}:00:00`,
+                      end: `2023-05-${this.getDia(horarioAsignado.horario.dia)}T0${horarioAsignado.horario.modulo+1}:00:00`
+                    }
+                  })
+                  console.log('Nuevo array: ', newArray)
+                  return newArray;
+                }
             )
         )
     }
