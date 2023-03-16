@@ -46,13 +46,13 @@ export interface Profesor  {
 }
 
 export interface HorarioXCurso {
-  materia: Materia;
-  profesor: Profesor;
-  curso: Curso ;
-  modulo: number;
-  turno: ETurno;
-  dia: EDia;
-  tipoProfesor: ETipoProfesor;
+  materia?: Materia;
+  profesor?: Profesor;
+  curso?: Curso ;
+  modulo?: number;
+  turno?: ETurno;
+  dia?: EDia;
+  tipoProfesor?: ETipoProfesor;
 }
 
 export interface CreateHorarioXCursoDto {
@@ -63,4 +63,10 @@ export interface CreateHorarioXCursoDto {
   turno: ETurno;
   dia: EDia;
   tipoProfesor: ETipoProfesor;
+}
+
+export interface CreateProfesoreDto {
+  nombre: string;
+  apellido: string;
+  dni: number;
 }

@@ -5,7 +5,7 @@ import { CalendarOptions } from '@fullcalendar/core'; // useful for typechecking
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import esLocale from '@fullcalendar/core/locales/es';
-import { CreateHorarioXCursoDto, Curso, ETipoProfesor, ETurno, HorarioXCurso, Materia, Profesor } from '../interfaces/horarios';
+import { CreateHorarioXCursoDto, CreateProfesoreDto, Curso, ETipoProfesor, ETurno, HorarioXCurso, Materia, Profesor } from '../interfaces/horarios';
 import { catchError, empty, first, map, of } from 'rxjs';
 interface horarioSemanal {
   modulos: number[];
@@ -36,7 +36,12 @@ export class CalendarComponent implements OnInit {
     me.horarioAAsignar.modulo = modulo;
     me.horarioAAsignar.dia = diaSemana;
     me.display = true;
+  }
 
+  displayProfesor: boolean = false;
+  showDialogProfesor() {
+    const me = this;
+    me.displayProfesor = true;
   }
 
   horarioAAsignar: HorarioXCurso = {
@@ -64,14 +69,13 @@ export class CalendarComponent implements OnInit {
   options!: CalendarOptions;
   weekDays: SelectItem[] = [];
 
-  constructor(protected dataService: HorariosService){ }
+  constructor(protected dataService: HorariosService){
+    const me = this;
+
+  }
 
   async ngOnInit() {
     const me = this;
-    me.cargarMaterias();
-    me.cargarProfesores();
-    me.cargarCurso();
-
     const newDate = new Date();
     this.options = {
       locale: esLocale,
@@ -86,14 +90,11 @@ export class CalendarComponent implements OnInit {
         hour: 'numeric',
         meridiem: false
       },
-      titleFormat: {
-        year: 'numeric',
-      },
       dayHeaderFormat: {
         weekday: 'short',
       },
       headerToolbar: {
-        start: 'title',
+        start: '',
         center: '',
         end: ''
       },
@@ -114,9 +115,10 @@ export class CalendarComponent implements OnInit {
     };
     await this.dataService.getHorarioXCurso().subscribe(result => {
       this.events = result
-      // this.events
     })
-
+    me.cargarMaterias();
+    me.cargarProfesores();
+    me.cargarCurso();
     // this.events = [
     //   {
     //     title: 'BCH237',
@@ -129,14 +131,6 @@ export class CalendarComponent implements OnInit {
     //   }
     //   // more events ...
     // ]
-    console.log(this.events)
-    this.weekDays = [
-      { label: 'Lunes', value: 1 },
-      { label: 'Martes', value: 2 },
-      { label: 'Miércoles', value: 3 },
-      { label: 'Jueves', value: 4 },
-      { label: 'Viernes', value: 5 }
-    ];
   }
 
   materias: Materia[] = []
@@ -147,10 +141,13 @@ export class CalendarComponent implements OnInit {
   }
 
   profesores: Profesor[] = []
-  selectedProfesor!: Profesor;
-  cargarProfesores(){
+  selectedProfesor?: (Profesor);
+  async cargarProfesores(){
     const me = this;
-    me.dataService.getProfesores().subscribe( result => me.profesores = result)
+    await me.dataService.getProfesores().subscribe( (result) => {
+      me.profesores = result
+      me.selectedProfesor = result[0]
+    })
   }
 
   turnos: ETurno[] = [ETurno.mañana, ETurno.tarde, ETurno.prehora];
@@ -185,6 +182,13 @@ export class CalendarComponent implements OnInit {
   profesorChange(event: Profesor){
     const me = this;
     me.horarioAAsignar.profesor = event;
+    me.selectedProfesor = event;
+  }
+
+  quitarSeleccion(){
+    const me = this;
+    me.horarioAAsignar.profesor = undefined;
+    // me.selectedProfesor = undefined;
   }
 
   async guardarHorario(){
@@ -198,12 +202,12 @@ export class CalendarComponent implements OnInit {
 
     const dto: CreateHorarioXCursoDto = {
       curso: me.selectedCurso._id,
-      materia: me.horarioAAsignar.materia._id,
-      profesor: me.horarioAAsignar.profesor._id,
-      modulo: me.horarioAAsignar.modulo,
-      turno: me.horarioAAsignar.turno,
-      dia: me.horarioAAsignar.dia,
-      tipoProfesor: me.horarioAAsignar.tipoProfesor,
+      materia: me.horarioAAsignar.materia?._id || '',
+      profesor: me.horarioAAsignar.profesor?._id || '',
+      modulo: me.horarioAAsignar.modulo || -1,
+      turno: me.horarioAAsignar.turno || ETurno.noche,
+      dia: me.horarioAAsignar.dia || EDia.lunes,
+      tipoProfesor: me.horarioAAsignar.tipoProfesor || ETipoProfesor.provisional,
     }
     console.log(dto)
     me.dataService.asignarHorario(dto).subscribe(result => {
@@ -218,19 +222,17 @@ export class CalendarComponent implements OnInit {
     return validado;
   }
 
-  // async getIdHorario(): Promise<Horario>{
-  //   const me = this;
-  //   return new Promise((resolve, reject) => {
-  //     me.dataService.getIdHorario(me.horarioAAsignar.horario.modulo, me.horarioAAsignar.horario.turno, me.horarioAAsignar.horario.dia)
-  //       .pipe(
-  //         first()
-  //       )
-  //       .subscribe((idHorario) => {
-  //         resolve(idHorario);
-  //       });
-  //   });
-
-  // }
+  dtoProfesor: CreateProfesoreDto ={
+    nombre: '',
+    apellido: '',
+    dni: 0,
+  };
+  agregarProfesor(){
+    const me = this;
+    if(this.dtoProfesor.apellido != '' && me.dtoProfesor.nombre != '' && me.dtoProfesor.dni != 0){
+      me.dataService.agregarProfesor(me.dtoProfesor).subscribe(() => me.cargarProfesores())
+    }
+  }
 }
 
 

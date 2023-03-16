@@ -4,7 +4,7 @@ import { HttpClient, HttpResponse, HttpHeaders , HttpRequest  } from '@angular/c
 import {map} from 'rxjs/operators';
 import { global } from "./global";
 import { Observable } from "rxjs";
-import { CreateHorarioXCursoDto, Curso, EDia, ETurno, HorarioXCurso, Materia, Profesor } from "../interfaces/horarios";
+import { CreateHorarioXCursoDto, CreateProfesoreDto, Curso, EDia, ETurno, HorarioXCurso, Materia, Profesor } from "../interfaces/horarios";
 
 interface Event {
   title?: string,
@@ -63,11 +63,14 @@ export class HorariosService{
                 result => {
                   const newArray: Event[] = result.map( horarioAsignado => {
                     const newDate = new Date()
+                    const dia = horarioAsignado.dia ? horarioAsignado.dia : EDia.lunes
+                    const modulo = horarioAsignado.modulo ? horarioAsignado.modulo : -1;
+                    const profesor = horarioAsignado.profesor ? `${horarioAsignado.profesor.nombre} ${horarioAsignado.profesor.apellido}` : ''
                     return {
-                      title: horarioAsignado.materia.nombre,
-                      start: `2023-05-0${this.getNroDia(horarioAsignado.dia)}T0${horarioAsignado.modulo}:00:00`,
-                      end: `2023-05-0${this.getNroDia(horarioAsignado.dia)}T0${horarioAsignado.modulo+1}:00:00`,
-                      description: horarioAsignado.profesor.nombre,
+                      title: horarioAsignado.materia?.nombre,
+                      start: `2023-05-0${this.getNroDia(dia)}T0${modulo}:00:00`,
+                      end: `2023-05-0${this.getNroDia(dia)}T0${modulo+1}:00:00`,
+                      description: profesor,
                       extendedProps: {
                         descripcion: 'Descripción del evento',
                         lugar: 'Lugar del evento'
@@ -125,6 +128,18 @@ export class HorariosService{
             )
         )
     }
+
+    agregarProfesor(dto: CreateProfesoreDto):Observable<any>{
+      let json = JSON.stringify(dto);
+      let params = 'json='+json;
+      let headers = new HttpHeaders('application/x-www-form-urlencoded');
+      console.log(json)
+      return this._http.post<any>(`${this.url}profesores`, json, {headers: {"Content-type":"application/json"}}).pipe(
+          map(
+              result => result
+          )
+      )
+  }
 
     // putAlumno(alumno: IAlumno):Observable<IResultAlumno>{
     //     let json = JSON.stringify(alumno);

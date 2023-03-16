@@ -14,6 +14,8 @@ import {DialogModule} from 'primeng/dialog';
 import {InputTextModule} from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
+import {ListboxModule} from 'primeng/listbox';
+import {InputNumberModule} from 'primeng/inputnumber';
 @NgModule({
   declarations: [
     AppComponent,
@@ -30,7 +32,9 @@ import { ButtonModule } from 'primeng/button';
     DialogModule,
     InputTextModule,
     FormsModule,
-    ButtonModule
+    ButtonModule,
+    ListboxModule,
+    InputNumberModule
   ],
   providers: [],
   bootstrap: [AppComponent]
