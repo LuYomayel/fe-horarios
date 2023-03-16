@@ -25,18 +25,21 @@ export interface Curso  {
   division: number;
 }
 
-export interface Horario  {
-  modulo: number;
-  turno: ETurno;
-  dia: EDia;
-  tipoProfesor: ETipoProfesor;
-}
+// export interface Horario  {
+//   _id: string;
+//   modulo: number;
+//   turno: ETurno;
+//   dia: EDia;
+//   tipoProfesor: ETipoProfesor;
+// }
 
 export interface Materia  {
+  _id: string;
   nombre: string;
 }
 
 export interface Profesor  {
+  _id: string;
   nombre: string;
   apellido: string;
   dni: number;
@@ -46,5 +49,18 @@ export interface HorarioXCurso {
   materia: Materia;
   profesor: Profesor;
   curso: Curso ;
-  horario: Horario ;
+  modulo: number;
+  turno: ETurno;
+  dia: EDia;
+  tipoProfesor: ETipoProfesor;
+}
+
+export interface CreateHorarioXCursoDto {
+  materia: string;
+  curso: string;
+  profesor: string;
+  modulo: number;
+  turno: ETurno;
+  dia: EDia;
+  tipoProfesor: ETipoProfesor;
 }

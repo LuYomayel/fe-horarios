@@ -4,7 +4,7 @@ import { HttpClient, HttpResponse, HttpHeaders , HttpRequest  } from '@angular/c
 import {map} from 'rxjs/operators';
 import { global } from "./global";
 import { Observable } from "rxjs";
-import { EDia, HorarioXCurso } from "../interfaces/horarios";
+import { CreateHorarioXCursoDto, Curso, EDia, ETurno, HorarioXCurso, Materia, Profesor } from "../interfaces/horarios";
 
 interface Event {
   title?: string,
@@ -23,7 +23,7 @@ export class HorariosService{
         this.url = global.url
     }
 
-    getDia(dia: EDia){
+    getNroDia(dia: EDia){
       switch(dia){
         case EDia.lunes:
           return 1
@@ -40,37 +40,91 @@ export class HorariosService{
       }
     }
 
-    getHorarioXCurso(): Observable<Event[]>{
-        console.log(this.url)
-        return this._http.get<HorarioXCurso[]>(`${this.url}horario-x-curso/curso/1/1`).pipe(
+    getDia(nro: number){
+      switch(nro){
+        case 1:
+          return EDia.lunes
+        case 2:
+          return EDia.martes
+        case 3:
+          return EDia.miercoles
+        case 4:
+          return EDia.jueves
+        case 5:
+          return EDia.viernes
+        default:
+          return EDia.lunes;
+      }
+    }
+
+    getHorarioXCurso(anio: number=1, curso:number=1): Observable<Event[]>{
+        return this._http.get<HorarioXCurso[]>(`${this.url}horario-x-curso/curso/${anio}/${curso}`).pipe(
             map(
                 result => {
                   const newArray: Event[] = result.map( horarioAsignado => {
                     const newDate = new Date()
                     return {
                       title: horarioAsignado.materia.nombre,
-                      start: `2023-05-${this.getDia(horarioAsignado.horario.dia)}T0${horarioAsignado.horario.modulo}:00:00`,
-                      end: `2023-05-${this.getDia(horarioAsignado.horario.dia)}T0${horarioAsignado.horario.modulo+1}:00:00`
+                      start: `2023-05-0${this.getNroDia(horarioAsignado.dia)}T0${horarioAsignado.modulo}:00:00`,
+                      end: `2023-05-0${this.getNroDia(horarioAsignado.dia)}T0${horarioAsignado.modulo+1}:00:00`,
+                      description: horarioAsignado.profesor.nombre,
+                      extendedProps: {
+                        descripcion: 'Descripción del evento',
+                        lugar: 'Lugar del evento'
+                      }
                     }
                   })
-                  console.log('Nuevo array: ', newArray)
+                  // console.log('Nuevo array: ', newArray)
                   return newArray;
                 }
             )
         )
     }
 
-    // addAlumno(Alumno: DTOAlumno):Observable<IResultAlumno>{
-    //     let json = JSON.stringify(Alumno);
-    //     let params = 'json='+json;
-    //     let headers = new HttpHeaders('application/x-www-form-urlencoded');
-    //     console.log(Alumno)
-    //     return this._http.post<IResultAlumno>(`${this.url}/students`, json, {headers: {"Content-type":"application/json"}}).pipe(
-    //         map(
-    //             result => result
-    //         )
+    getMaterias(): Observable<Materia[]>{
+      return this._http.get<Materia[]>(`${this.url}materias`).pipe(
+        map(
+            result => result
+
+        )
+      )
+    }
+
+    getProfesores(): Observable<Profesor[]>{
+      return this._http.get<Profesor[]>(`${this.url}profesores`).pipe(
+        map(
+            result => result
+        )
+      )
+    }
+
+    getCursos(): Observable<Curso[]>{
+      return this._http.get<Curso[]>(`${this.url}cursos`).pipe(
+        map(
+            result => result
+        )
+      )
+    }
+
+    // getIdHorario(modulo:number, turno: ETurno, dia: EDia): Observable<Horario>{
+    //   return this._http.get<Horario>(`${this.url}horarios/${modulo}/${turno}/${dia}`).pipe(
+    //     map(
+    //         result => result
     //     )
+    //   )
     // }
+
+    asignarHorario(horarioAAsignar: CreateHorarioXCursoDto):Observable<any>{
+        let json = JSON.stringify(horarioAAsignar);
+        let params = 'json='+json;
+        let headers = new HttpHeaders('application/x-www-form-urlencoded');
+        console.log(json)
+        return this._http.post<any>(`${this.url}horario-x-curso`, json, {headers: {"Content-type":"application/json"}}).pipe(
+            map(
+                result => result
+            )
+        )
+    }
 
     // putAlumno(alumno: IAlumno):Observable<IResultAlumno>{
     //     let json = JSON.stringify(alumno);

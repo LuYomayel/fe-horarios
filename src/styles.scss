@@ -1,1 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
+
+.fc .fc-timegrid-slot {
+  height: 10em; /* Cambia la altura de la celda de día */
+}
+
+.fc-daygrid-day-frame {
+  height: 100%; /* Hace que el contenido de la celda se ajuste a la altura especificada */
+}

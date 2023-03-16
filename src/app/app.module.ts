@@ -10,6 +10,10 @@ import { CalendarComponent } from './calendar/calendar.component';
 import { HttpClientModule } from '@angular/common/http';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { DropdownModule } from 'primeng/dropdown';
+import {DialogModule} from 'primeng/dialog';
+import {InputTextModule} from 'primeng/inputtext';
+import { FormsModule } from '@angular/forms';
+import { ButtonModule } from 'primeng/button';
 @NgModule({
   declarations: [
     AppComponent,
@@ -22,7 +26,11 @@ import { DropdownModule } from 'primeng/dropdown';
     AppRoutingModule,
     HttpClientModule,
     FullCalendarModule,
-    DropdownModule
+    DropdownModule,
+    DialogModule,
+    InputTextModule,
+    FormsModule,
+    ButtonModule
   ],
   providers: [],
   bootstrap: [AppComponent]

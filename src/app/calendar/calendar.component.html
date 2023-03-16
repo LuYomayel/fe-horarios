@@ -49,9 +49,80 @@
 <h1>Calendario de horarios</h1>
 <div class="p-grid">
   <div class="p-col-12">
-    <p-dropdown [options]="weekDays"></p-dropdown>
+    <p-dropdown [options]="cursos" [(ngModel)]="selectedCurso" [filter]="true" filterBy="anio" (ngModelChange)="cursoChange()">
+      <ng-template pTemplate="selectedItem">
+        <div class="country-item country-item-value" *ngIf="selectedCurso">
+            <div>{{selectedCurso.anio}}° {{selectedCurso.division}}°</div>
+        </div>
+      </ng-template>
+      <ng-template let-curso pTemplate="item">
+        <div class="curso-item">
+            <div>{{curso.anio}}° {{curso.division}}°</div>
+        </div>
+      </ng-template>
+    </p-dropdown>
   </div>
   <div class="p-col-12">
     <full-calendar [options]="options" [events]="events"></full-calendar>
   </div>
 </div>
+
+
+<p-dialog header="Agregar horario" [(visible)]="display" [draggable]="false" [modal]="true">
+  <form class="formulario-horario">
+
+    <label for="profesor">Profesor:</label>
+    <div class="contenedor">
+      <p-dropdown [options]="profesores" [(ngModel)]="selectedProfesor" name="profesor" [filter]="true" optionLabel="apellido" filterBy="apellido" [showClear]="true" (ngModelChange)="profesorChange($event)">
+        <ng-template pTemplate="selectedItem">
+          <div class="country-item country-item-value" *ngIf="selectedProfesor">
+              <div>{{selectedProfesor.nombre}} {{selectedProfesor.apellido}}</div>
+          </div>
+        </ng-template>
+        <ng-template let-profesor pTemplate="item">
+          <div class="profesor-item">
+              <div>{{profesor.nombre}} {{profesor.apellido}}</div>
+          </div>
+        </ng-template>
+      </p-dropdown>
+    </div>
+
+    <label for="materia">Materia:</label>
+    <div class="contenedor">
+      <p-dropdown [options]="materias" [(ngModel)]="selectedMateria" name="materia" [filter]="true" optionLabel="nombre" filterBy="nombre" [showClear]="true" (ngModelChange)="materiaChange($event)"></p-dropdown>
+    </div>
+
+    <label for="horario" class="block">Turno:</label>
+    <div class="contenedor">
+      <p-dropdown [options]="turnos" [(ngModel)]="turnoSelected" name="materia" [showClear]="true" (ngModelChange)="turnoChange($event)"></p-dropdown>
+    </div>
+
+    <label for="horario" class="block">Dia:</label>
+    <input type="text" pInputText  id="horario" class="form-control" name="dia" [(ngModel)]="horarioAAsignar.dia" required>
+
+    <label for="horario" class="block">Modulo:</label>
+    <input type="text" pInputText  id="horario" class="form-control" name="modulo" [(ngModel)]="horarioAAsignar.modulo" required>
+
+
+
+    <label for="curso">Curso:</label>
+    <div class="contenedor">
+      <p-dropdown [options]="cursos" [(ngModel)]="selectedCurso" [filter]="true" filterBy="anio"  name="curso">
+        <ng-template pTemplate="selectedItem">
+          <div class="country-item country-item-value" *ngIf="selectedCurso">
+              <div>{{selectedCurso.anio}}° {{selectedCurso.division}}°</div>
+          </div>
+        </ng-template>
+        <ng-template let-curso pTemplate="item">
+          <div class="curso-item">
+              <div>{{curso.anio}}° {{curso.division}}°</div>
+          </div>
+        </ng-template>
+      </p-dropdown>
+    </div>
+
+    <div style="margin-top: 1rem;">
+      <p-button (onClick)="guardarHorario()" class="btn btn-primary">Enviar</p-button>
+    </div>
+  </form>
+</p-dialog>

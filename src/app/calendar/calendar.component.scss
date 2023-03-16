@@ -1,0 +1,37 @@
+.formulario-horario {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 500px;
+}
+
+.formulario-horario .p-inputtext {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.formulario-horario .p-button {
+  width: 100%;
+}
+
+.formulario-horario label {
+  align-self: flex-start;
+}
+
+.contenedor{
+  width: 100%;
+}
+
+:host ::ng-deep{
+  .p-inputtext{
+    width: 100%;
+  }
+  .p-dropdown{
+    width: 100%;
+  }
+  .fc .fc-timegrid-slot {
+    height: 5rem; /* Cambia la altura de la celda de día */
+  }
+}
+
+
