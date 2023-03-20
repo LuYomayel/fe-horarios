@@ -1,10 +1,12 @@
 import { Injectable } from "@angular/core";
-import { HttpClient, HttpResponse, HttpHeaders , HttpRequest  } from '@angular/common/http';
-
+import { HttpClient, HttpResponse, HttpHeaders , HttpRequest, HttpErrorResponse   } from '@angular/common/http';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 import {map} from 'rxjs/operators';
 import { global } from "./global";
 import { Observable } from "rxjs";
 import { CreateHorarioXCursoDto, CreateProfesoreDto, Curso, EDia, ETurno, HorarioXCurso, Materia, Profesor } from "../interfaces/horarios";
+import { AppComponent } from "../app.component";
 
 interface Event {
   title?: string,
@@ -18,7 +20,8 @@ export class HorariosService{
     public url:string;
 
     constructor(
-        public _http:HttpClient
+        public _http:HttpClient,
+        private appComponent: AppComponent
     ){
         this.url = global.url
     }
@@ -80,9 +83,46 @@ export class HorariosService{
                   // console.log('Nuevo array: ', newArray)
                   return newArray;
                 }
-            )
+            ),
+            catchError((error: HttpErrorResponse) => {
+              console.log('Error; ', error)
+              if (error.status === 404) {
+                this.appComponent.showErrorToast(error.error.message);
+              } else {
+                // Puedes manejar otros errores aquí
+              }
+              return throwError(error);
+            }),
+
         )
     }
+
+    getHorarioXProfesor(profesor: Profesor, turno: ETurno): Observable<Event[]>{
+      return this._http.get<HorarioXCurso[]>(`${this.url}horario-x-curso/profesor/${profesor._id}/${turno}`).pipe(
+          map(
+              result => {
+                const newArray: Event[] = result.map( horarioAsignado => {
+                  const newDate = new Date()
+                  const dia = horarioAsignado.dia ? horarioAsignado.dia : EDia.lunes
+                  const modulo = horarioAsignado.modulo ? horarioAsignado.modulo : -1;
+                  const profesorNombre = profesor ? `${profesor.nombre} ${profesor.apellido}` : ''
+                  return {
+                    title: horarioAsignado.materia?.nombre,
+                    start: `2023-05-0${this.getNroDia(dia)}T0${modulo}:00:00`,
+                    end: `2023-05-0${this.getNroDia(dia)}T0${modulo+1}:00:00`,
+                    description: profesorNombre,
+                    extendedProps: {
+                      descripcion: 'Descripción del evento',
+                      lugar: 'Lugar del evento'
+                    }
+                  }
+                })
+                // console.log('Nuevo array: ', newArray)
+                return newArray;
+              }
+          )
+      )
+  }
 
     getMaterias(): Observable<Materia[]>{
       return this._http.get<Materia[]>(`${this.url}materias`).pipe(

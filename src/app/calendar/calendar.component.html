@@ -5,19 +5,16 @@
 </div>
 <div class="container">
   <div class="left-column">
-      <div class="title centrar">
+      <div class="contenedor">
+        <p-dropdown [options]="optionsFiltro" [(ngModel)]="selectedFiltro" (ngModelChange)="filtroChange($event)" [style]="{'width':'15rem'}" class="mb-2"></p-dropdown>
+      </div>
+      <!-- <div class="title centrar">
         <label>Profesores </label>
         <button pButton pRipple type="button" icon="pi pi-plus" class="p-button-rounded p-button-success p-button-outlined" title="Agregar Profesor" (click)="showDialogProfesor()"></button>
-      </div>
-      <!-- <ul class="profesores">
-          <li>Profesor 1</li>
-          <li>Profesor 2</li>
-          <li>Profesor 3</li>
-           Agrega más profesores aquí
-      </ul> -->
-      <p-listbox [options]="profesores" [(ngModel)]="selectedProfesor" (ngModelChange)="profesorChange($event)" (onDblClick)="quitarSeleccion()" [filter]="true" filterBy="nombre" filterMatchMode="contains" optionLabel="nombre" [listStyle]="{'height':'32rem'}" [style]="{'width':'15rem'}">
+      </div> -->
+      <p-listbox *ngIf="selectedFiltro.key == 2" [options]="profesores" [(ngModel)]="selectedProfesor" (ngModelChange)="profesorChange($event)" (onDblClick)="quitarSeleccion()" [filter]="true" filterBy="nombre" filterMatchMode="contains" optionLabel="nombre" [listStyle]="{'height':'31.5rem'}" [style]="{'width':'15rem'}">
         <ng-template pTemplate="selectedItem">
-          <div class="country-item country-item-value" *ngIf="selectedProfesor">
+          <div  *ngIf="selectedProfesor">
               <div>{{selectedProfesor.nombre}} {{selectedProfesor.apellido}}</div>
           </div>
         </ng-template>
@@ -27,48 +24,26 @@
           </div>
         </ng-template>
       </p-listbox>
-  </div>
-  <div class="contenedor">
-    <div>
-      <label for="curso" class="title">Curso: </label>
-      <p-dropdown [options]="cursos" [(ngModel)]="selectedCurso" [filter]="true" filterBy="anio" (ngModelChange)="cursoChange()" [style]="{'width':'15rem'}">
+      <p-listbox *ngIf="selectedFiltro.key == 1" [options]="cursos" [(ngModel)]="selectedCurso" (ngModelChange)="cursoChange()"  [listStyle]="{'height':'33rem'}" [style]="{'width':'15rem'}">
         <ng-template pTemplate="selectedItem">
-          <div class="country-item country-item-value" *ngIf="selectedCurso">
-              <div>{{selectedCurso.anio}}° {{selectedCurso.division}}°</div>
+          <div  *ngIf="selectedCurso">
+            <div>{{selectedCurso.anio}}° {{selectedCurso.division}}°</div>
           </div>
         </ng-template>
         <ng-template let-curso pTemplate="item">
           <div class="curso-item">
-              <div>{{curso.anio}}° {{curso.division}}°</div>
-          </div>
+            <div>{{curso.anio}}° {{curso.division}}°</div>
+        </div>
         </ng-template>
-      </p-dropdown>
+      </p-listbox>
+  </div>
+  <div class="contenedor">
+    <div class="contenedor" *ngIf="selectedFiltro.key == 2">
+      <p-dropdown [options]="optionsFiltroTurno" [(ngModel)]="selectedFiltroTurno" (ngModelChange)="filtroTurnoChange($event)" [style]="{'width':'15rem'}" class="mb-2"></p-dropdown>
     </div>
     <full-calendar [options]="options" [events]="events"></full-calendar>
   </div>
 </div>
-
-<!-- <h1>Calendario de horarios</h1>
-<div class="p-grid">
-  <div class="p-col-12">
-    <p-dropdown [options]="cursos" [(ngModel)]="selectedCurso" [filter]="true" filterBy="anio" (ngModelChange)="cursoChange()">
-      <ng-template pTemplate="selectedItem">
-        <div class="country-item country-item-value" *ngIf="selectedCurso">
-            <div>{{selectedCurso.anio}}° {{selectedCurso.division}}°</div>
-        </div>
-      </ng-template>
-      <ng-template let-curso pTemplate="item">
-        <div class="curso-item">
-            <div>{{curso.anio}}° {{curso.division}}°</div>
-        </div>
-      </ng-template>
-    </p-dropdown>
-  </div>
-  <div class="p-col-12">
-    <full-calendar [options]="options" [events]="events" style="border: 0" width="800" height="600"></full-calendar>
-  </div>
-</div> -->
-
 
 <p-dialog header="Agregar horario" [(visible)]="display" [draggable]="false" [modal]="true">
   <form class="formulario-horario">
@@ -132,7 +107,6 @@
 <p-dialog header="Agregar Profesor" [(visible)]="displayProfesor" [draggable]="false" [modal]="true">
   <form class="formulario-profesor">
 
-
     <label for="horario" class="block">Nombre:</label>
     <input type="text" pInputText  id="nombre" class="form-control" name="nombre" [(ngModel)]="dtoProfesor.nombre" required>
 
@@ -150,3 +124,5 @@
     </div>
   </form>
 </p-dialog>
+
+<p-toast position="bottom-right" key="bc"></p-toast>

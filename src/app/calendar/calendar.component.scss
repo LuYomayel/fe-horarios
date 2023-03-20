@@ -40,6 +40,9 @@
   .fc .fc-timegrid-slot {
     height: 5rem; /* Cambia la altura de la celda de día */
   }
+  .fc .fc-toolbar.fc-header-toolbar {
+     margin-bottom: 0em;
+  }
 }
 
 :host{

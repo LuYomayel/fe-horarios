@@ -23,6 +23,7 @@ export interface Curso  {
   _id: string;
   anio: number;
   division: number;
+  turno: ETurno[];
 }
 
 // export interface Horario  {
@@ -50,7 +51,6 @@ export interface HorarioXCurso {
   profesor?: Profesor;
   curso?: Curso ;
   modulo?: number;
-  turno?: ETurno;
   dia?: EDia;
   tipoProfesor?: ETipoProfesor;
 }
@@ -60,7 +60,6 @@ export interface CreateHorarioXCursoDto {
   curso: string;
   profesor: string;
   modulo: number;
-  turno: ETurno;
   dia: EDia;
   tipoProfesor: ETipoProfesor;
 }

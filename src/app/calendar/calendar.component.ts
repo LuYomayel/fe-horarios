@@ -7,6 +7,8 @@ import interactionPlugin from '@fullcalendar/interaction'
 import esLocale from '@fullcalendar/core/locales/es';
 import { CreateHorarioXCursoDto, CreateProfesoreDto, Curso, ETipoProfesor, ETurno, HorarioXCurso, Materia, Profesor } from '../interfaces/horarios';
 import { catchError, empty, first, map, of } from 'rxjs';
+import {MessageService} from 'primeng/api';
+import { PrimeNGConfig } from 'primeng/api';
 interface horarioSemanal {
   modulos: number[];
   dias: EDia[]
@@ -24,7 +26,7 @@ enum EDia {
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
-  providers: [ HorariosService ]
+  providers: [ HorariosService, MessageService ]
 })
 
 export class CalendarComponent implements OnInit {
@@ -35,6 +37,8 @@ export class CalendarComponent implements OnInit {
     me.horarioAAsignar.curso = me.selectedCurso;
     me.horarioAAsignar.modulo = modulo;
     me.horarioAAsignar.dia = diaSemana;
+    me.turnos = me.selectedCurso.turno;
+    console.log('Curso: ', me.selectedCurso)
     me.display = true;
   }
 
@@ -44,15 +48,30 @@ export class CalendarComponent implements OnInit {
     me.displayProfesor = true;
   }
 
+  optionsFiltro: any[] = [
+    {
+    label: 'Cursos',
+    key: 1
+    },
+    {
+      label: 'Profesores',
+      key: 2
+    }
+  ]
+
+  selectedFiltro!: any;
+  selectedFiltroTurno!: any;
+  optionsFiltroTurno: ETurno[] = [ETurno.mañana, ETurno.tarde, ETurno.prehora];
+
   horarioAAsignar: HorarioXCurso = {
     dia: EDia.lunes,
     modulo: 1,
     tipoProfesor: ETipoProfesor.titular,
-    turno: ETurno.mañana,
     curso: {
       _id: '1',
       anio: 1,
-      division: 1
+      division: 1,
+      turno: [ETurno.mañana]
     },
     materia: {
       _id: '',
@@ -69,9 +88,13 @@ export class CalendarComponent implements OnInit {
   options!: CalendarOptions;
   weekDays: SelectItem[] = [];
 
-  constructor(protected dataService: HorariosService){
+  constructor(
+    protected dataService: HorariosService,
+    private messageService: MessageService,
+    private primengConfig: PrimeNGConfig
+  ){
     const me = this;
-
+    me.primengConfig.ripple = true;
   }
 
   async ngOnInit() {
@@ -119,18 +142,6 @@ export class CalendarComponent implements OnInit {
     me.cargarMaterias();
     me.cargarProfesores();
     me.cargarCurso();
-    // this.events = [
-    //   {
-    //     title: 'BCH237',
-    //     start: '2023-05-01T01:30:00',
-    //     end: '2023-05-01T05:30:00',
-    //     extendedProps: {
-    //       department: 'BioChemistry'
-    //     },
-    //     description: 'Lecture'
-    //   }
-    //   // more events ...
-    // ]
   }
 
   materias: Materia[] = []
@@ -157,21 +168,19 @@ export class CalendarComponent implements OnInit {
   selectedCurso!: Curso;
 
   idHorario!: string;
-  cargarCurso(){
+  async cargarCurso(){
     const me = this;
-    me.dataService.getCursos().subscribe(result => me.cursos = result)
+    await me.dataService.getCursos().subscribe(result => me.cursos = result)
   }
 
   cursoChange(){
     const me = this;
-    // console.log('Curso selected', event)
-    // console.log('Curso selected', me.selectedCurso)
-    me.dataService.getHorarioXCurso(me.selectedCurso.anio, me.selectedCurso.division).subscribe(result => me.events = result)
+    if(me.selectedFiltro.key == 1)me.dataService.getHorarioXCurso(me.selectedCurso.anio, me.selectedCurso.division).subscribe(result => me.events = result)
   }
 
   turnoChange(event:ETurno){
     const me = this;
-    me.horarioAAsignar.turno = event;
+    if(me.horarioAAsignar.curso)me.horarioAAsignar.curso.turno[0] = event;
   }
 
   materiaChange(event: Materia){
@@ -183,6 +192,10 @@ export class CalendarComponent implements OnInit {
     const me = this;
     me.horarioAAsignar.profesor = event;
     me.selectedProfesor = event;
+    if(me.selectedFiltro.key == 2)me.dataService.getHorarioXProfesor(event, this.selectedFiltroTurno).subscribe(result => {
+      console.log('Horarios del profe: ', result)
+      me.events = result;
+    })
   }
 
   quitarSeleccion(){
@@ -198,23 +211,18 @@ export class CalendarComponent implements OnInit {
       return;
     }
 
-    // await me.getIdHorario().then(result => me.idHorario = result._id)
-
     const dto: CreateHorarioXCursoDto = {
       curso: me.selectedCurso._id,
       materia: me.horarioAAsignar.materia?._id || '',
       profesor: me.horarioAAsignar.profesor?._id || '',
       modulo: me.horarioAAsignar.modulo || -1,
-      turno: me.horarioAAsignar.turno || ETurno.noche,
       dia: me.horarioAAsignar.dia || EDia.lunes,
       tipoProfesor: me.horarioAAsignar.tipoProfesor || ETipoProfesor.provisional,
     }
-    console.log(dto)
     me.dataService.asignarHorario(dto).subscribe(result => {
       me.display = false;
       me.cursoChange();
     })
-    console.log('Guardando...')
   }
 
   validarCampos(){
@@ -231,7 +239,26 @@ export class CalendarComponent implements OnInit {
     const me = this;
     if(this.dtoProfesor.apellido != '' && me.dtoProfesor.nombre != '' && me.dtoProfesor.dni != 0){
       me.dataService.agregarProfesor(me.dtoProfesor).subscribe(() => me.cargarProfesores())
+      me.displayProfesor = false;
+      me.showBottomCenter();
     }
+  }
+
+  showBottomCenter() {
+    this.messageService.add({key: 'bc', severity:'success', summary: 'Registro exitoso', detail: 'Profesor guardado correctamente!'});
+  }
+
+  filtroChange(event:any){
+    console.log(this.selectedFiltro)
+  }
+
+  filtroTurnoChange(event: ETurno){
+    const me = this;
+
+    if(me.selectedFiltro.key == 2 && me.selectedProfesor)me.dataService.getHorarioXProfesor(me.selectedProfesor, event).subscribe(result => {
+      console.log('Horarios del profe: ', result)
+      me.events = result;
+    })
   }
 }
 
