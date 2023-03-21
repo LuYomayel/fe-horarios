@@ -222,6 +222,9 @@ export class CalendarComponent implements OnInit {
     me.dataService.asignarHorario(dto).subscribe(result => {
       me.display = false;
       me.cursoChange();
+    }, error => {
+      console.log('ERROR: ', error.error.message)
+      me.showErrorToast(error.error.message)
     })
   }
 
@@ -246,6 +249,15 @@ export class CalendarComponent implements OnInit {
 
   showBottomCenter() {
     this.messageService.add({key: 'bc', severity:'success', summary: 'Registro exitoso', detail: 'Profesor guardado correctamente!'});
+  }
+
+  showErrorToast(message: string) {
+    this.messageService.add({
+      key: 'bc',
+      severity: 'error',
+      summary: 'Error',
+      detail: message,
+    });
   }
 
   filtroChange(event:any){

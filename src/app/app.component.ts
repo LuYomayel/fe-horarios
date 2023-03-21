@@ -15,6 +15,7 @@ export class AppComponent {
 
   showErrorToast(message: string) {
     this.messageService.add({
+      key: 'bc',
       severity: 'error',
       summary: 'Error',
       detail: message,

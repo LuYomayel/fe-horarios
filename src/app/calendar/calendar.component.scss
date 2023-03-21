@@ -5,6 +5,19 @@
   width: 500px;
 }
 
+.alinear{
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ancho{
+  width: 11rem;
+}
+.ancho2{
+  width: 15rem;
+}
+
 .formulario-profesor {
   display: flex;
   flex-direction: column;

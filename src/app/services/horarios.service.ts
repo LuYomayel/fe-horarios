@@ -7,6 +7,7 @@ import { global } from "./global";
 import { Observable } from "rxjs";
 import { CreateHorarioXCursoDto, CreateProfesoreDto, Curso, EDia, ETurno, HorarioXCurso, Materia, Profesor } from "../interfaces/horarios";
 import { AppComponent } from "../app.component";
+import { CalendarComponent } from "../calendar/calendar.component";
 
 interface Event {
   title?: string,
@@ -86,12 +87,7 @@ export class HorariosService{
             ),
             catchError((error: HttpErrorResponse) => {
               console.log('Error; ', error)
-              if (error.status === 404) {
-                this.appComponent.showErrorToast(error.error.message);
-              } else {
-                // Puedes manejar otros errores aquí
-              }
-              return throwError(error);
+              return throwError(() => new Error(error.message));
             }),
 
         )

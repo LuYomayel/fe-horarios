@@ -5,14 +5,15 @@
 </div>
 <div class="container">
   <div class="left-column">
-      <div class="contenedor">
-        <p-dropdown [options]="optionsFiltro" [(ngModel)]="selectedFiltro" (ngModelChange)="filtroChange($event)" [style]="{'width':'15rem'}" class="mb-2"></p-dropdown>
-      </div>
-      <!-- <div class="title centrar">
-        <label>Profesores </label>
-        <button pButton pRipple type="button" icon="pi pi-plus" class="p-button-rounded p-button-success p-button-outlined" title="Agregar Profesor" (click)="showDialogProfesor()"></button>
-      </div> -->
-      <p-listbox *ngIf="selectedFiltro.key == 2" [options]="profesores" [(ngModel)]="selectedProfesor" (ngModelChange)="profesorChange($event)" (onDblClick)="quitarSeleccion()" [filter]="true" filterBy="nombre" filterMatchMode="contains" optionLabel="nombre" [listStyle]="{'height':'31.5rem'}" [style]="{'width':'15rem'}">
+    <div class="alinear">
+        <!-- <div class="contenedor"> -->
+          <p-dropdown [options]="optionsFiltro" [(ngModel)]="selectedFiltro" (ngModelChange)="filtroChange($event)" [ngClass]="{'ancho':selectedFiltro?.key==2, 'ancho2': selectedFiltro?.key==1}"></p-dropdown>
+
+            <button *ngIf="selectedFiltro?.key == 2" pButton pRipple type="button" icon="pi pi-plus" class="p-button-rounded p-button-success p-button-outlined" title="Agregar Profesor" (click)="showDialogProfesor()"></button>
+
+          <!-- </div> -->
+          </div>
+      <p-listbox *ngIf="selectedFiltro?.key == 2" [options]="profesores" [(ngModel)]="selectedProfesor" (ngModelChange)="profesorChange($event)" (onDblClick)="quitarSeleccion()" [filter]="true" filterBy="nombre" filterMatchMode="contains" optionLabel="nombre" [listStyle]="{'height':'31.5rem'}" [style]="{'width':'15rem'}">
         <ng-template pTemplate="selectedItem">
           <div  *ngIf="selectedProfesor">
               <div>{{selectedProfesor.nombre}} {{selectedProfesor.apellido}}</div>
@@ -24,7 +25,7 @@
           </div>
         </ng-template>
       </p-listbox>
-      <p-listbox *ngIf="selectedFiltro.key == 1" [options]="cursos" [(ngModel)]="selectedCurso" (ngModelChange)="cursoChange()"  [listStyle]="{'height':'33rem'}" [style]="{'width':'15rem'}">
+      <p-listbox *ngIf="selectedFiltro?.key == 1" [options]="cursos" [(ngModel)]="selectedCurso" (ngModelChange)="cursoChange()"  [listStyle]="{'height':'33rem'}" [style]="{'width':'15rem'}">
         <ng-template pTemplate="selectedItem">
           <div  *ngIf="selectedCurso">
             <div>{{selectedCurso.anio}}° {{selectedCurso.division}}°</div>
@@ -38,7 +39,7 @@
       </p-listbox>
   </div>
   <div class="contenedor">
-    <div class="contenedor" *ngIf="selectedFiltro.key == 2">
+    <div class="contenedor" *ngIf="selectedFiltro?.key == 2">
       <p-dropdown [options]="optionsFiltroTurno" [(ngModel)]="selectedFiltroTurno" (ngModelChange)="filtroTurnoChange($event)" [style]="{'width':'15rem'}" class="mb-2"></p-dropdown>
     </div>
     <full-calendar [options]="options" [events]="events"></full-calendar>
