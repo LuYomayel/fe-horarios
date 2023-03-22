@@ -37,14 +37,21 @@ export class CalendarComponent implements OnInit {
     me.horarioAAsignar.curso = me.selectedCurso;
     me.horarioAAsignar.modulo = modulo;
     me.horarioAAsignar.dia = diaSemana;
-    me.turnos = me.selectedCurso.turno;
-    console.log('Curso: ', me.selectedCurso)
+    if(me.selectedFiltro.key == 1){
+      me.turnos = me.selectedCurso.turno;
+    }
+    if(me.selectedFiltro.key == 2){
+      me.disableProfesor = true;
+      me.turnos = [ETurno.mañana, ETurno.prehora, ETurno.tarde];
+    }
     me.display = true;
   }
 
+  disableProfesor:boolean = false;
   displayProfesor: boolean = false;
   showDialogProfesor() {
     const me = this;
+
     me.displayProfesor = true;
   }
 
@@ -134,7 +141,16 @@ export class CalendarComponent implements OnInit {
       eventClick: function(info) {
       },
       height: '36rem',
-
+      eventContent: function(info) {
+        const eventTitle = info.event.title;
+        const eventDescription = info.event.extendedProps['description'];
+        console.log('EventTitle; ', eventTitle)
+        console.log('eventDescription; ', eventDescription)
+        return {
+          html: `<div class="fc-title">${eventTitle}<br>${eventDescription}</div>`,
+          classNames: ['my-event-class']
+        };
+      }
     };
     await this.dataService.getHorarioXCurso().subscribe(result => {
       this.events = result
@@ -175,7 +191,10 @@ export class CalendarComponent implements OnInit {
 
   cursoChange(){
     const me = this;
-    if(me.selectedFiltro.key == 1)me.dataService.getHorarioXCurso(me.selectedCurso.anio, me.selectedCurso.division).subscribe(result => me.events = result)
+    if(me.selectedFiltro.key == 1)me.dataService.getHorarioXCurso(me.selectedCurso.anio, me.selectedCurso.division).subscribe(result => {
+      me.events = result
+      me.options.eventDisplay = 'block';
+    })
   }
 
   turnoChange(event:ETurno){
@@ -193,7 +212,7 @@ export class CalendarComponent implements OnInit {
     me.horarioAAsignar.profesor = event;
     me.selectedProfesor = event;
     if(me.selectedFiltro.key == 2)me.dataService.getHorarioXProfesor(event, this.selectedFiltroTurno).subscribe(result => {
-      console.log('Horarios del profe: ', result)
+
       me.events = result;
     })
   }
