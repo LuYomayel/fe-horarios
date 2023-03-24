@@ -17,11 +17,13 @@ import { ButtonModule } from 'primeng/button';
 import {ListboxModule} from 'primeng/listbox';
 import {InputNumberModule} from 'primeng/inputnumber';
 import {ToastModule} from 'primeng/toast';
+import { LoginComponent } from './login/login.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    CalendarComponent
+    CalendarComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,

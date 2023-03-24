@@ -175,28 +175,22 @@ export class HorariosService{
               result => result
           )
       )
-  }
+    }
 
-    // putAlumno(alumno: IAlumno):Observable<IResultAlumno>{
-    //     let json = JSON.stringify(alumno);
-    //     let params = 'json='+json;
-    //     let headers = new HttpHeaders('application/x-www-form-urlencoded');
-    //     console.log(alumno)
-    //     return this._http.put<IResultAlumno>(`${this.url}/students/${alumno.idAlumno}`, json, {headers: {"Content-type":"application/json"}}).pipe(
-    //         map(
-    //             result => result
-
-    //         )
-    //     )
-    // }
-
-    // deleteAlumno(idAlumno: number):Observable<IResultAlumno>{
-    //     console.log(idAlumno)
-    //     return this._http.delete<IResultAlumno>(`${this.url}/students/${idAlumno}`).pipe(
-    //         map(
-    //             result => result
-    //         )
-    //     )
-    // }
+    login(nombre: string, contrasenia:string):Observable<any>{
+      const usuario = {
+        nombreUsuario: nombre,
+        contrasenia
+      }
+      let json = JSON.stringify(usuario);
+      let params = 'json='+json;
+      let headers = new HttpHeaders('application/x-www-form-urlencoded');
+      console.log(json)
+      return this._http.post<any>(`${this.url}login`, json, {headers: {"Content-type":"application/json"}}).pipe(
+          map(
+              result => result
+          )
+      )
+    }
 
 }
