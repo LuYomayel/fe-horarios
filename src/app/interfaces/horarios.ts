@@ -44,6 +44,7 @@ export interface Profesor  {
   nombre: string;
   apellido: string;
   dni: number;
+  fechaNacimiento: Date;
 }
 
 export interface HorarioXCurso {
@@ -68,4 +69,17 @@ export interface CreateProfesoreDto {
   nombre: string;
   apellido: string;
   dni: number;
+  fechaNacimiento: Date;
+}
+
+export enum ERoles {
+  ADMIN = 'ADMIN',
+  VISUALIZAR = 'VISUALIZAR',
+}
+
+export interface IUsuario {
+  nombreUsuario: string;
+  contrasenia?: string;
+  correo: string;
+  roles: ERoles[];
 }

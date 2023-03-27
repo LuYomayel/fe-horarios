@@ -13,7 +13,7 @@
 
           <!-- </div> -->
           </div>
-      <p-listbox *ngIf="selectedFiltro?.key == 2" [options]="profesores" [(ngModel)]="selectedProfesor" (ngModelChange)="profesorChange($event)" (onDblClick)="quitarSeleccion()" [filter]="true" filterBy="nombre" filterMatchMode="contains" optionLabel="nombre" [listStyle]="{'height':'31.5rem'}" [style]="{'width':'15rem'}">
+      <p-listbox *ngIf="selectedFiltro?.key == 2" [options]="profesores" [(ngModel)]="selectedProfesor" (ngModelChange)="profesorChange($event)" (onDblClick)="quitarSeleccion()" [filter]="true" filterBy="nombre" filterMatchMode="contains" optionLabel="nombre" [listStyle]="{'height':'31.5rem'}">
         <ng-template pTemplate="selectedItem">
           <div  *ngIf="selectedProfesor">
               <div>{{selectedProfesor.nombre}} {{selectedProfesor.apellido}}</div>
@@ -105,7 +105,7 @@
   </form>
 </p-dialog>
 
-<p-dialog header="Agregar Profesor" [(visible)]="displayProfesor" [draggable]="false" [modal]="true">
+<p-dialog header="Agregar Profesor" [(visible)]="displayProfesor" [draggable]="false" [modal]="true" >
   <form class="formulario-profesor">
 
     <label for="horario" class="block">Nombre:</label>
@@ -116,7 +116,13 @@
 
     <label for="horario" class="block">Dni:</label>
     <div class="contenedor">
-      <p-inputNumber inputId="dni" [(ngModel)]="dtoProfesor.dni" class="form-control" name="dni" style="width: 100%;"></p-inputNumber>
+      <p-inputNumber inputId="dni" [(ngModel)]="dtoProfesor.dni" class="form-control" name="dni"></p-inputNumber>
+    </div>
+
+    <label for="horario" class="block">Fecha de nacimiento:</label>
+    <div class="contenedor">
+      <!-- <p-calendar [(ngModel)]="dtoProfesor.fechaNacimiento" [readonlyInput]="false" name="fechaNacimiento"></p-calendar> -->
+      <input class="p-inputtext custom-date-input" type="date" [(ngModel)]="dtoProfesor.fechaNacimiento"  name="fechaNacimiento" />
     </div>
     <!-- <input type="text" pInputText  id="dni" class="form-control" name="dni" [(ngModel)]="dtoProfesor.dni" required> -->
 

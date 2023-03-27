@@ -8,6 +8,7 @@
   <div>
     <label for="password">Contraseña:</label>
     <input type="password" id="password" name="password" [(ngModel)]="contrasenia">
+    <p *ngIf="contraseniaIncorrecta" style="color:red">Usuario o contraseña es incorrecta.</p>
   </div>
   <button (click)="login()" type="submit">Iniciar sesión</button>
 </form>

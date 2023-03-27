@@ -56,6 +56,18 @@
   .fc .fc-toolbar.fc-header-toolbar {
      margin-bottom: 0em;
   }
+
+  .p-dialog{
+    width: 500px;
+  }
+
+  .p-inputtext {
+    width: 100%;
+  }
+
+  p-inputnumber, .p-inputnumber{
+    width: 100%;
+  }
 }
 
 :host{
@@ -106,7 +118,18 @@
     align-items: center; /* Alinea los elementos verticalmente */
     justify-content: space-evenly; /* Alinea los elementos horizontalmente */
   }
+  /* En tu archivo CSS */
+  .custom-date-input::-webkit-calendar-picker-indicator {
+    display: none;
+  }
 
+  .custom-date-input::-moz-calendar-picker-indicator {
+    display: none;
+  }
+
+  .custom-date-input::-ms-calendar-picker-indicator {
+    display: none;
+  }
 
 }
 

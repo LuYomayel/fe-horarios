@@ -5,10 +5,10 @@ import { throwError } from 'rxjs';
 import {map} from 'rxjs/operators';
 import { global } from "./global";
 import { Observable } from "rxjs";
-import { CreateHorarioXCursoDto, CreateProfesoreDto, Curso, EDia, ETurno, HorarioXCurso, Materia, Profesor } from "../interfaces/horarios";
+import { CreateHorarioXCursoDto, CreateProfesoreDto, Curso, EDia, ERoles, ETurno, HorarioXCurso, Materia, Profesor } from "../interfaces/horarios";
 import { AppComponent } from "../app.component";
 import { CalendarComponent } from "../calendar/calendar.component";
-
+import jwtDecode from "jwt-decode";
 interface Event {
   title?: string,
   start?: string,
@@ -25,6 +25,7 @@ export class HorariosService{
         private appComponent: AppComponent
     ){
         this.url = global.url
+
     }
 
     getNroDia(dia: EDia){
@@ -191,6 +192,19 @@ export class HorariosService{
               result => result
           )
       )
+    }
+
+    getRolesUsuario(): ERoles[] {
+      try {
+        const token = localStorage.getItem('token') || '';
+        const decodedToken: any = jwtDecode(token);
+        console.log(decodedToken)
+        const roles: ERoles[] = decodedToken.role || [];
+        return roles;
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        return [];
+      }
     }
 
 }

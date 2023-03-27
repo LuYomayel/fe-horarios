@@ -5,10 +5,11 @@ import { CalendarOptions } from '@fullcalendar/core'; // useful for typechecking
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import esLocale from '@fullcalendar/core/locales/es';
-import { CreateHorarioXCursoDto, CreateProfesoreDto, Curso, ETipoProfesor, ETurno, HorarioXCurso, Materia, Profesor } from '../interfaces/horarios';
+import { CreateHorarioXCursoDto, CreateProfesoreDto, Curso, ERoles, ETipoProfesor, ETurno, HorarioXCurso, IUsuario, Materia, Profesor } from '../interfaces/horarios';
 import { catchError, empty, first, map, of } from 'rxjs';
 import {MessageService} from 'primeng/api';
 import { PrimeNGConfig } from 'primeng/api';
+import { AuthGuard } from '../services/auth-guard';
 interface horarioSemanal {
   modulos: number[];
   dias: EDia[]
@@ -34,25 +35,33 @@ export class CalendarComponent implements OnInit {
   display: boolean = false;
   showDialog(modulo: number, diaSemana: EDia) {
     const me = this;
-    me.horarioAAsignar.curso = me.selectedCurso;
-    me.horarioAAsignar.modulo = modulo;
-    me.horarioAAsignar.dia = diaSemana;
-    if(me.selectedFiltro.key == 1){
-      me.turnos = me.selectedCurso.turno;
+    if(me.roles.includes(ERoles.ADMIN)){
+      me.horarioAAsignar.curso = me.selectedCurso;
+      me.horarioAAsignar.modulo = modulo;
+      me.horarioAAsignar.dia = diaSemana;
+      if(me.selectedFiltro.key == 1){
+        me.turnos = me.selectedCurso.turno;
+      }
+      if(me.selectedFiltro.key == 2){
+        me.disableProfesor = true;
+        me.turnos = [ETurno.mañana, ETurno.prehora, ETurno.tarde];
+      }
+      me.display = true;
+    }else{
+      me.showErrorToast('No tienes permisos para asignar horarios.')
     }
-    if(me.selectedFiltro.key == 2){
-      me.disableProfesor = true;
-      me.turnos = [ETurno.mañana, ETurno.prehora, ETurno.tarde];
-    }
-    me.display = true;
   }
 
   disableProfesor:boolean = false;
   displayProfesor: boolean = false;
   showDialogProfesor() {
     const me = this;
+    if(me.roles.includes(ERoles.ADMIN)){
+      me.displayProfesor = true;
+    }else{
+      me.showErrorToast('No tienes permisos para agregar profesores.')
+    }
 
-    me.displayProfesor = true;
   }
 
   optionsFiltro: any[] = [
@@ -88,20 +97,24 @@ export class CalendarComponent implements OnInit {
       _id: '',
       apellido: '',
       dni: 0,
-      nombre: ''
+      nombre: '',
+      fechaNacimiento: new Date()
     }
   };
   events: any[] = [];
   options!: CalendarOptions;
   weekDays: SelectItem[] = [];
-
+  roles: ERoles[] = [];
   constructor(
     protected dataService: HorariosService,
     private messageService: MessageService,
-    private primengConfig: PrimeNGConfig
+    private primengConfig: PrimeNGConfig,
+    private authGuard: AuthGuard
   ){
     const me = this;
     me.primengConfig.ripple = true;
+    me.roles = me.dataService.getRolesUsuario();
+    console.log('Roles; ', me.roles)
   }
 
   async ngOnInit() {
@@ -238,13 +251,24 @@ export class CalendarComponent implements OnInit {
       dia: me.horarioAAsignar.dia || EDia.lunes,
       tipoProfesor: me.horarioAAsignar.tipoProfesor || ETipoProfesor.provisional,
     }
-    me.dataService.asignarHorario(dto).subscribe(result => {
-      me.display = false;
-      me.cursoChange();
-    }, error => {
-      console.log('ERROR: ', error.error.message)
-      me.showErrorToast(error.error.message)
+    me.dataService.asignarHorario(dto).subscribe({
+      next: value => {
+        me.display = false;
+        me.cursoChange();
+      },
+      error: error => {
+        console.log('ERROR: ', error.error.message)
+        me.showErrorToast(error.error.message)
+      },
+      complete: () => console.log('Completado')
     })
+    // me.dataService.asignarHorario(dto).subscribe(result => {
+    //   me.display = false;
+    //   me.cursoChange();
+    // }, error => {
+    //   console.log('ERROR: ', error.error.message)
+    //   me.showErrorToast(error.error.message)
+    // })
   }
 
   validarCampos(){
@@ -256,13 +280,25 @@ export class CalendarComponent implements OnInit {
     nombre: '',
     apellido: '',
     dni: 0,
+    fechaNacimiento: new Date()
   };
   agregarProfesor(){
     const me = this;
-    if(this.dtoProfesor.apellido != '' && me.dtoProfesor.nombre != '' && me.dtoProfesor.dni != 0){
+
+    if(!me.esFechaValida()) {
+      me.showErrorToast(`Fecha de nacimiento inválida: el año debe estar entre 1920 y ${new Date().getFullYear()-18}.`)
+      return;
+    }
+    if(!me.esDniValido(me.dtoProfesor.dni.toString())){
+      me.showErrorToast('Formato de dni inválido.')
+      return;
+    }
+    if(this.dtoProfesor.apellido != '' && me.dtoProfesor.nombre != ''){
       me.dataService.agregarProfesor(me.dtoProfesor).subscribe(() => me.cargarProfesores())
       me.displayProfesor = false;
       me.showBottomCenter();
+    }else{
+      me.showErrorToast('Se deben completar todos los campos.')
     }
   }
 
@@ -290,6 +326,20 @@ export class CalendarComponent implements OnInit {
       console.log('Horarios del profe: ', result)
       me.events = result;
     })
+  }
+
+  esDniValido(dni:string) {
+    // La expresión regular verifica que el DNI tenga entre 1 y 8 dígito
+    const dniRegex = /^\d{7,8}$/;
+
+    // Si el DNI cumple con la expresión regular, es válido
+    return dniRegex.test(dni);
+  }
+
+  esFechaValida(){
+    const me = this;
+    const fechaNacimiento = new Date(me.dtoProfesor.fechaNacimiento);
+    return (fechaNacimiento.getFullYear() > 1920 && fechaNacimiento.getFullYear() < (new Date().getFullYear()-18));
   }
 }
 

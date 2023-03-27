@@ -7,7 +7,7 @@ import {Table, TableModule} from 'primeng/table';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CalendarComponent } from './calendar/calendar.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { DropdownModule } from 'primeng/dropdown';
 import {DialogModule} from 'primeng/dialog';
@@ -18,6 +18,9 @@ import {ListboxModule} from 'primeng/listbox';
 import {InputNumberModule} from 'primeng/inputnumber';
 import {ToastModule} from 'primeng/toast';
 import { LoginComponent } from './login/login.component';
+import { HttpInterceptorService } from './services/http-interceptor';
+import {CalendarModule} from 'primeng/calendar';
+
 
 @NgModule({
   declarations: [
@@ -39,9 +42,17 @@ import { LoginComponent } from './login/login.component';
     ButtonModule,
     ListboxModule,
     InputNumberModule,
-    ToastModule
+    ToastModule,
+    CalendarModule
   ],
-  providers: [AppComponent],
+  providers: [
+    AppComponent,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpInterceptorService,
+      multi: true,
+    },
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
