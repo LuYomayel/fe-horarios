@@ -114,7 +114,6 @@ export class CalendarComponent implements OnInit {
     const me = this;
     me.primengConfig.ripple = true;
     me.roles = me.dataService.getRolesUsuario();
-    console.log('Roles; ', me.roles)
   }
 
   async ngOnInit() {
@@ -157,8 +156,6 @@ export class CalendarComponent implements OnInit {
       eventContent: function(info) {
         const eventTitle = info.event.title;
         const eventDescription = info.event.extendedProps['description'];
-        console.log('EventTitle; ', eventTitle)
-        console.log('eventDescription; ', eventDescription)
         return {
           html: `<div class="fc-title">${eventTitle}<br>${eventDescription}</div>`,
           classNames: ['my-event-class']
@@ -177,16 +174,22 @@ export class CalendarComponent implements OnInit {
   selectedMateria!: Materia;
   cargarMaterias(){
     const me = this;
-    me.dataService.getMaterias().subscribe( result => me.materias = result)
+    me.dataService.getMaterias().subscribe({
+      next: result => me.materias = result,
+      error: error => me.showErrorToast(error.error.message)
+    })
   }
 
   profesores: Profesor[] = []
   selectedProfesor?: (Profesor);
   async cargarProfesores(){
     const me = this;
-    await me.dataService.getProfesores().subscribe( (result) => {
+    await me.dataService.getProfesores().subscribe( {
+      next: (result) => {
       me.profesores = result
       me.selectedProfesor = result[0]
+      },
+      error: error => me.showErrorToast(error.error.message)
     })
   }
 
@@ -199,7 +202,11 @@ export class CalendarComponent implements OnInit {
   idHorario!: string;
   async cargarCurso(){
     const me = this;
-    await me.dataService.getCursos().subscribe(result => me.cursos = result)
+    await me.dataService.getCursos().subscribe({
+      next: result => me.cursos = result,
+      error: error => me.showErrorToast(error.error.message)
+      }
+    )
   }
 
   cursoChange(){
@@ -257,7 +264,6 @@ export class CalendarComponent implements OnInit {
         me.cursoChange();
       },
       error: error => {
-        console.log('ERROR: ', error.error.message)
         me.showErrorToast(error.error.message)
       },
       complete: () => console.log('Completado')

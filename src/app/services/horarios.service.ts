@@ -186,7 +186,6 @@ export class HorariosService{
       let json = JSON.stringify(usuario);
       let params = 'json='+json;
       let headers = new HttpHeaders('application/x-www-form-urlencoded');
-      console.log(json)
       return this._http.post<any>(`${this.url}login`, json, {headers: {"Content-type":"application/json"}}).pipe(
           map(
               result => result
