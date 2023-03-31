@@ -20,8 +20,8 @@ import {ToastModule} from 'primeng/toast';
 import { LoginComponent } from './login/login.component';
 import { HttpInterceptorService } from './services/http-interceptor';
 import {CalendarModule} from 'primeng/calendar';
-
-
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { AvatarModule } from 'primeng/avatar';
 @NgModule({
   declarations: [
     AppComponent,
@@ -43,7 +43,9 @@ import {CalendarModule} from 'primeng/calendar';
     ListboxModule,
     InputNumberModule,
     ToastModule,
-    CalendarModule
+    CalendarModule,
+    ProgressSpinnerModule,
+    AvatarModule
   ],
   providers: [
     AppComponent,

@@ -18,6 +18,8 @@
   width: 15rem;
 }
 
+
+
 .formulario-profesor {
   display: flex;
   flex-direction: column;
@@ -51,11 +53,17 @@
     width: 100%;
   }
   .fc .fc-timegrid-slot {
-    height: 5rem; /* Cambia la altura de la celda de día */
+    height: 6rem; /* Cambia la altura de la celda de día */
   }
   .fc .fc-toolbar.fc-header-toolbar {
      margin-bottom: 0em;
   }
+
+  .fc-timegrid-slot-label {
+    height: 1.5em;
+    line-height: 1.5em;
+  }
+
 
   .formulario-profesor{
     width: 500px;
@@ -68,6 +76,21 @@
   p-inputnumber, .p-inputnumber{
     width: 100%;
   }
+
+  /* your.component.scss or your.component.css */
+  .spinner-overlay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999; /* A high z-index value to make sure it's on top of other elements */
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+  }
+
 }
 
 :host{

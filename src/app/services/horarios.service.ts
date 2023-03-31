@@ -62,6 +62,24 @@ export class HorariosService{
       }
     }
 
+    getHorario(modulo:number, turno: ETurno) : any {
+      const me = this;
+      switch(modulo){
+        case 1:
+          return turno == ETurno.mañana ? {start: '07:45' , end: '08:30'} : {start: '12:50' , end: '13:50'}
+        case 2:
+          return turno == ETurno.mañana ? {start: '08:30' , end: '09:30'} : {start: '13:50' , end: '14:50'}
+        case 3:
+          return turno == ETurno.mañana ? {start: '09:50' , end: '10:50'} : {start: '15:10' , end: '16:10'}
+        case 4:
+          return turno == ETurno.mañana ? {start: '10:50' , end: '11:50'} : {start: '16:10' , end: '17:10'}
+        case 5:
+          return turno == ETurno.mañana ? {start: '11:50' , end: '12:50'} : {start: '17:10' , end: '18:10'}
+        case 6:
+          return turno == ETurno.tarde ? {start: '11:50' , end: '12:50'} : {start: '17:10' , end: '18:10'}
+      }
+    }
+
     getHorarioXCurso(anio: number=1, curso:number=1): Observable<Event[]>{
         return this._http.get<HorarioXCurso[]>(`${this.url}horario-x-curso/curso/${anio}/${curso}`).pipe(
             map(
@@ -71,13 +89,17 @@ export class HorariosService{
                     const dia = horarioAsignado.dia ? horarioAsignado.dia : EDia.lunes
                     const modulo = horarioAsignado.modulo ? horarioAsignado.modulo : -1;
                     const profesor = horarioAsignado.profesor ? `${horarioAsignado.profesor.nombre} ${horarioAsignado.profesor.apellido}` : ''
+                    const objHorario = this.getHorario((horarioAsignado.modulo || -1), (horarioAsignado.curso?.turno[0] || ETurno.noche))
+                    // console.log('horarios: ', objHorario)
                     return {
                       title: horarioAsignado.materia?.nombre,
-                      start: `2023-05-0${this.getNroDia(dia)}T0${modulo}:00:00`,
-                      end: `2023-05-0${this.getNroDia(dia)}T0${modulo+1}:00:00`,
+                      start: `2023-05-0${this.getNroDia(dia)}T${objHorario.start}:00`,
+                      end: `2023-05-0${this.getNroDia(dia)}T${objHorario.end}:00`,
+                      // start: `2023-05-0${this.getNroDia(dia)}T0${modulo}:00:00`,
+                      // end: `2023-05-0${this.getNroDia(dia)}T0${modulo+1}:00:00`,
                       description: profesor,
                       extendedProps: {
-                        descripcion: 'Descripción del evento',
+                        descripcion: `${horarioAsignado.tipoProfesor}`,
                         lugar: 'Lugar del evento'
                       }
                     }
@@ -102,14 +124,15 @@ export class HorariosService{
                   const newDate = new Date()
                   const dia = horarioAsignado.dia ? horarioAsignado.dia : EDia.lunes
                   const modulo = horarioAsignado.modulo ? horarioAsignado.modulo : -1;
-                  const profesorNombre = profesor ? `${profesor.nombre} ${profesor.apellido}` : ''
+                  const profesorNombre = profesor ? `${profesor.nombre} ${profesor.apellido}` : '';
+                  const objHorario = this.getHorario((horarioAsignado.modulo || -1), (horarioAsignado.curso?.turno[0] || ETurno.noche))
                   return {
                     title: horarioAsignado.materia?.nombre,
-                    start: `2023-05-0${this.getNroDia(dia)}T0${modulo}:00:00`,
-                    end: `2023-05-0${this.getNroDia(dia)}T0${modulo+1}:00:00`,
+                    start: `2023-05-0${this.getNroDia(dia)}T${objHorario.start}:00`,
+                    end: `2023-05-0${this.getNroDia(dia)}T${objHorario.end}:00`,
                     description: profesorNombre,
                     extendedProps: {
-                      descripcion: 'Descripción del evento',
+                      descripcion: `${horarioAsignado.tipoProfesor}`,
                       lugar: 'Lugar del evento'
                     }
                   }

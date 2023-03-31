@@ -133,3 +133,7 @@
 </p-dialog>
 
 <p-toast position="bottom-right" key="bc"></p-toast>
+
+<div *ngIf="loading" class="spinner-overlay">
+  <p-progressSpinner [style]="{width: '50px', height: '50px'}" strokeWidth="8" fill="none" animationDuration="2s"></p-progressSpinner>
+</div>
