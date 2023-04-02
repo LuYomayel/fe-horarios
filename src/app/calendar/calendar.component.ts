@@ -347,6 +347,15 @@ export class CalendarComponent implements OnInit {
     const fechaNacimiento = new Date(me.dtoProfesor.fechaNacimiento);
     return (fechaNacimiento.getFullYear() > 1920 && fechaNacimiento.getFullYear() < (new Date().getFullYear()-18));
   }
+
+  imprimir(){
+    const me = this;
+    me.dataService.verPdf()
+    // .subscribe({
+    //   next: (value:any) => console.log('Value: ', value),
+    //   error: (error:any) => console.log('Error 123: ', error)
+    // })
+  }
 }
 
 
