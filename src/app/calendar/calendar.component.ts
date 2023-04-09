@@ -445,6 +445,7 @@ export class CalendarComponent implements OnInit {
     return (fechaNacimiento.getFullYear() > 1920 && fechaNacimiento.getFullYear() < (new Date().getFullYear()-18));
   }
 
+
   getNroModulo(modulo:number){
     const me = this;
     if(this.selectedCurso.turno.includes(ETurno.tarde) && modulo == 11) return 6;
@@ -511,6 +512,16 @@ export class CalendarComponent implements OnInit {
       default:
         return 'Error tipo Profe'
     }
+  }
+
+
+  imprimir(){
+    const me = this;
+    me.dataService.verPdf()
+    // .subscribe({
+    //   next: (value:any) => console.log('Value: ', value),
+    //   error: (error:any) => console.log('Error 123: ', error)
+    // })
   }
 
 }

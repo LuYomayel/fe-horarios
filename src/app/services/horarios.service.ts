@@ -169,6 +169,22 @@ export class HorariosService{
       )
     }
 
+    getPDF(): any{
+      return this._http.get<any>(`${this.url}horario-x-curso/descargar-horario`).pipe(
+        map(
+            result => result
+        )
+      )
+    }
+
+    verPdf() {
+      return this._http.get(`${this.url}horario-x-curso/descargar-horario/curso/1/1`, { responseType: 'blob' }).subscribe((pdfData: Blob) => {
+        const file = new Blob([pdfData], { type: 'application/pdf' });
+        const fileURL = URL.createObjectURL(file);
+        window.open(fileURL, '_blank');
+      });
+    }
+
     // getIdHorario(modulo:number, turno: ETurno, dia: EDia): Observable<Horario>{
     //   return this._http.get<Horario>(`${this.url}horarios/${modulo}/${turno}/${dia}`).pipe(
     //     map(
