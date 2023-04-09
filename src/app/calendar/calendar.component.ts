@@ -23,6 +23,8 @@ enum EDia {
   viernes = 'Vienes',
 }
 
+
+
 @Component({
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
@@ -67,8 +69,8 @@ export class CalendarComponent implements OnInit {
 
   optionsFiltro: any[] = [
     {
-    label: 'Cursos',
-    key: 1
+      label: 'Cursos',
+      key: 1
     },
     {
       label: 'Profesores',
@@ -80,6 +82,10 @@ export class CalendarComponent implements OnInit {
   selectedFiltroTurno!: any;
   optionsFiltroTurno: ETurno[] = [ETurno.mañana, ETurno.tarde];
   loading: boolean = false;
+  // TODO: Me falta un tipo de profesor.
+  // TODO: Cambiar color del evento segun tipo de profesor.
+  opcionesTipoProfesor: ETipoProfesor[] = [ETipoProfesor.titular, ETipoProfesor.suplente, ETipoProfesor.provisional]
+  selectedTipoProfesor: ETipoProfesor = ETipoProfesor.titular;
   horarioAAsignar: HorarioXCurso = {
     dia: EDia.lunes,
     modulo: 1,
@@ -234,7 +240,11 @@ export class CalendarComponent implements OnInit {
         me.materias = result
         me.loading = false;
       },
-      error: error => me.showErrorToast(error.error.message)
+      error: error => {
+        me.showErrorToast(error.error.message)
+        me.loading = false;
+      }
+
     })
   }
 
@@ -249,7 +259,10 @@ export class CalendarComponent implements OnInit {
         me.selectedProfesor = result[0]
         me.loading = false;
       },
-      error: error => me.showErrorToast(error.error.message)
+      error: error => {
+        me.showErrorToast(error.error.message)
+        me.loading = false;
+      }
     })
   }
 
@@ -268,7 +281,10 @@ export class CalendarComponent implements OnInit {
         me.cursos = result
         me.loading = false;
       },
-      error: error => me.showErrorToast(error.error.message)
+      error: error => {
+        me.showErrorToast(error.error.message)
+        me.loading = false;
+      }
       }
     )
   }
@@ -298,13 +314,14 @@ export class CalendarComponent implements OnInit {
     me.horarioAAsignar.materia = event;
   }
 
-  profesorChange(event: Profesor){
+  profesorChange(){
     const me = this;
-    me.horarioAAsignar.profesor = event;
-    me.selectedProfesor = event;
-    if(me.selectedFiltro.key == 2){
+
+    me.horarioAAsignar.profesor = me.selectedProfesor;
+
+    if(me.selectedFiltro.key == 2 && me.selectedProfesor){
       me.loading = true;
-      me.dataService.getHorarioXProfesor(event, this.selectedFiltroTurno).subscribe(result => {
+      me.dataService.getHorarioXProfesor(me.selectedProfesor, this.selectedFiltroTurno).subscribe(result => {
         me.events = result;
         me.loading = false;
       })
@@ -330,17 +347,20 @@ export class CalendarComponent implements OnInit {
       profesor: me.horarioAAsignar.profesor?._id || '',
       modulo: me.horarioAAsignar.modulo || -1,
       dia: me.horarioAAsignar.dia || EDia.lunes,
-      tipoProfesor: me.horarioAAsignar.tipoProfesor || ETipoProfesor.provisional,
+      tipoProfesor: me.selectedTipoProfesor,
     }
     me.loading = true;
     me.dataService.asignarHorario(dto).subscribe({
       next: value => {
         me.display = false;
         me.loading = false;
-        me.cursoChange();
+        if(me.selectedFiltro.key == 1)me.cursoChange();
+        if(me.selectedFiltro.key == 2)me.profesorChange();
+
       },
       error: error => {
         me.showErrorToast(error.error.message)
+        me.loading = false;
       },
       complete: () => console.log('Completado')
     })

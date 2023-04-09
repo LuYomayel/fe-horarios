@@ -13,7 +13,7 @@
 
           <!-- </div> -->
           </div>
-      <p-listbox *ngIf="selectedFiltro?.key == 2" [options]="profesores" [(ngModel)]="selectedProfesor" (ngModelChange)="profesorChange($event)" (onDblClick)="quitarSeleccion()" [filter]="true" filterBy="nombre" filterMatchMode="contains" optionLabel="nombre" [listStyle]="{'height':'31.5rem'}">
+      <p-listbox *ngIf="selectedFiltro?.key == 2" [options]="profesores" [(ngModel)]="selectedProfesor" (ngModelChange)="profesorChange()" (onDblClick)="quitarSeleccion()" [filter]="true" filterBy="nombre" filterMatchMode="contains" optionLabel="nombre" [listStyle]="{'height':'31.5rem'}">
         <ng-template pTemplate="selectedItem">
           <div  *ngIf="selectedProfesor">
               <div>{{selectedProfesor.nombre}} {{selectedProfesor.apellido}}</div>
@@ -51,7 +51,7 @@
 
     <label for="profesor">Profesor:</label>
     <div class="contenedor">
-      <p-dropdown [disabled]="disableProfesor == true" [options]="profesores" [(ngModel)]="selectedProfesor" name="profesor" [filter]="true" optionLabel="apellido" filterBy="apellido" [showClear]="true" (ngModelChange)="profesorChange($event)">
+      <p-dropdown [disabled]="disableProfesor == true" [options]="profesores" [(ngModel)]="selectedProfesor" name="profesor" [filter]="true" optionLabel="apellido" filterBy="apellido" [showClear]="true" (ngModelChange)="profesorChange()">
         <ng-template pTemplate="selectedItem">
           <div class="country-item country-item-value" *ngIf="selectedProfesor">
               <div>{{selectedProfesor.nombre}} {{selectedProfesor.apellido}}</div>
@@ -75,6 +75,11 @@
       <p-dropdown [options]="turnos" [(ngModel)]="turnoSelected" name="materia" [showClear]="true" (ngModelChange)="turnoChange($event)"></p-dropdown>
     </div>
 
+    <label for="horario" class="block">Tipo Profesor:</label>
+    <div class="contenedor">
+      <p-dropdown [options]="opcionesTipoProfesor" [(ngModel)]="selectedTipoProfesor" name="tipoProfesor" [showClear]="true"></p-dropdown>
+    </div>
+
     <label for="horario" class="block">Dia:</label>
     <input [disabled]="true" type="text" pInputText  id="horario" class="form-control" name="dia" [(ngModel)]="horarioAAsignar.dia" required>
 
@@ -85,7 +90,7 @@
 
     <label for="curso">Curso:</label>
     <div class="contenedor">
-      <p-dropdown [disabled]="true" [options]="cursos" [(ngModel)]="selectedCurso" [filter]="true" filterBy="anio"  name="curso">
+      <p-dropdown [disabled]="selectedFiltro.key == 1" [options]="cursos" [(ngModel)]="selectedCurso" [filter]="true" filterBy="anio"  name="curso">
         <ng-template pTemplate="selectedItem">
           <div class="country-item country-item-value" *ngIf="selectedCurso">
               <div>{{selectedCurso.anio}}° {{selectedCurso.division}}°</div>
