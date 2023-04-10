@@ -177,8 +177,8 @@ export class HorariosService{
       )
     }
 
-    verPdf() {
-      return this._http.get(`${this.url}horario-x-curso/descargar-horario/curso/1/1`, { responseType: 'blob' }).subscribe((pdfData: Blob) => {
+    verPdf(anio: number, division: number) {
+      return this._http.get(`${this.url}horario-x-curso/descargar-horario/curso/${anio}/${division}`, { responseType: 'blob' }).subscribe((pdfData: Blob) => {
         const file = new Blob([pdfData], { type: 'application/pdf' });
         const fileURL = URL.createObjectURL(file);
         window.open(fileURL, '_blank');

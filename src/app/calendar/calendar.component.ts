@@ -517,7 +517,7 @@ export class CalendarComponent implements OnInit {
 
   imprimir(){
     const me = this;
-    me.dataService.verPdf()
+    me.dataService.verPdf(me.selectedCurso.anio, me.selectedCurso.division)
     // .subscribe({
     //   next: (value:any) => console.log('Value: ', value),
     //   error: (error:any) => console.log('Error 123: ', error)

@@ -72,7 +72,7 @@
 
     <label for="horario" class="block">Turno:</label>
     <div class="contenedor">
-      <p-dropdown [options]="turnos" [(ngModel)]="turnoSelected" name="materia" [showClear]="true" (ngModelChange)="turnoChange($event)"></p-dropdown>
+      <p-dropdown [disabled]="true" [options]="turnos" [(ngModel)]="turnoSelected" name="materia" [showClear]="true" (ngModelChange)="turnoChange($event)"></p-dropdown>
     </div>
 
     <label for="horario" class="block">Tipo Profesor:</label>
