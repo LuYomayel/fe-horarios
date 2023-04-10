@@ -10,6 +10,7 @@ import { catchError, empty, first, map, of } from 'rxjs';
 import {MessageService} from 'primeng/api';
 import { PrimeNGConfig } from 'primeng/api';
 import { AuthGuard } from '../services/auth-guard';
+import { Route, Router } from '@angular/router';
 interface horarioSemanal {
   modulos: number[];
   dias: EDia[]
@@ -44,10 +45,12 @@ export class CalendarComponent implements OnInit {
       me.horarioAAsignar.dia = diaSemana;
       if(me.selectedFiltro.key == 1){
         me.turnos = me.selectedCurso.turno;
+        me.cursosDialog = me.cursos;
       }
       if(me.selectedFiltro.key == 2){
         me.disableProfesor = true;
-        me.turnos = [ETurno.mañana, ETurno.tarde];
+        me.turnos = [me.selectedFiltroTurno];
+        me.cursosDialog = me.cursos.filter(curso => curso.turno.includes(me.selectedFiltroTurno))
       }
       me.display = true;
     }else{
@@ -118,7 +121,8 @@ export class CalendarComponent implements OnInit {
     protected dataService: HorariosService,
     private messageService: MessageService,
     private primengConfig: PrimeNGConfig,
-    private authGuard: AuthGuard
+    private authGuard: AuthGuard,
+    private route:Router
   ){
     const me = this;
     me.primengConfig.ripple = true;
@@ -256,7 +260,8 @@ export class CalendarComponent implements OnInit {
     await me.dataService.getProfesores().subscribe( {
       next: (result) => {
         me.profesores = result
-        me.selectedProfesor = result[0]
+        me.selectedProfesor = result[0];
+        me.profesores = me.profesores.sort((a, b) => a.apellido.localeCompare(b.apellido));
         me.loading = false;
       },
       error: error => {
@@ -270,6 +275,7 @@ export class CalendarComponent implements OnInit {
   turnoSelected!: ETurno;
 
   cursos: Curso[] = [];
+  cursosDialog: Curso[] = [];
   selectedCurso!: Curso;
 
   idHorario!: string;
@@ -278,7 +284,14 @@ export class CalendarComponent implements OnInit {
     me.loading = true;
     await me.dataService.getCursos().subscribe({
       next: result => {
-        me.cursos = result
+        me.cursos = result;
+        console.log('Cursos: ', result)
+        me.cursos = me.cursos.sort((a, b) => {
+          if (a.anio === b.anio) {
+            return a.division - b.division;
+          }
+          return a.anio - b.anio;
+        });
         me.loading = false;
       },
       error: error => {
@@ -419,6 +432,7 @@ export class CalendarComponent implements OnInit {
 
   filtroChange(event:any){
     console.log(this.selectedFiltro)
+    this.selectedFiltro.key == 2 ? this.profesorChange() : this.cursoChange();
   }
 
   filtroTurnoChange(event: ETurno){
@@ -448,7 +462,8 @@ export class CalendarComponent implements OnInit {
 
   getNroModulo(modulo:number){
     const me = this;
-    if(this.selectedCurso.turno.includes(ETurno.tarde) && modulo == 11) return 6;
+    if(this.selectedCurso.turno.includes(ETurno.tarde) && modulo == 11 && this.selectedFiltro.key == 1) return 6;
+    if(modulo == 11 && this.selectedFiltro.key == 2 && this.selectedFiltroTurno == ETurno.tarde) return 6;
     switch(modulo){
       case 7:
       case 12:
@@ -457,13 +472,13 @@ export class CalendarComponent implements OnInit {
       case 13:
         return 2;
       case 9:
-      case 14:
+      case 15:
         return 3;
       case 10:
-      case 15:
+      case 16:
         return 4;
       case 11:
-      case 16:
+      case 17:
         return 5;
       default:
         return -2
@@ -522,6 +537,13 @@ export class CalendarComponent implements OnInit {
     //   next: (value:any) => console.log('Value: ', value),
     //   error: (error:any) => console.log('Error 123: ', error)
     // })
+  }
+
+  cerrarSesion(){
+    this.loading = true;
+    localStorage.clear();
+    this.route.navigate(['/login']);
+    this.loading = false;
   }
 
 }

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
 import { PrimeNGConfig } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 
@@ -10,8 +11,8 @@ import { MessageService } from 'primeng/api';
 })
 export class AppComponent {
   title = 'fe-horarios';
-  constructor(private primengConfig: PrimeNGConfig, private messageService: MessageService) {}
-
+  constructor(private primengConfig: PrimeNGConfig, private messageService: MessageService, private router: Router) {}
+  showNavBar = true;
 
   showErrorToast(message: string) {
     this.messageService.add({
@@ -24,6 +25,11 @@ export class AppComponent {
 
   ngOnInit() {
       this.primengConfig.ripple = true;
+      this.router.events.subscribe((event) => {
+        if (event instanceof NavigationEnd) {
+          this.showNavBar = !this.router.url.includes('/login');
+        }
+      });
       this.primengConfig.setTranslation({
         accept: 'Aceptar',
         reject: 'Cancelar',

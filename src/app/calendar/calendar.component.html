@@ -72,7 +72,7 @@
 
     <label for="horario" class="block">Turno:</label>
     <div class="contenedor">
-      <p-dropdown [disabled]="true" [options]="turnos" [(ngModel)]="turnoSelected" name="materia" [showClear]="true" (ngModelChange)="turnoChange($event)"></p-dropdown>
+      <p-dropdown [disabled]="true" [options]="turnos" [(ngModel)]="turnoSelected" name="turno" [showClear]="true" (ngModelChange)="turnoChange($event)"></p-dropdown>
     </div>
 
     <label for="horario" class="block">Tipo Profesor:</label>
@@ -90,7 +90,7 @@
 
     <label for="curso">Curso:</label>
     <div class="contenedor">
-      <p-dropdown [disabled]="selectedFiltro.key == 1" [options]="cursos" [(ngModel)]="selectedCurso" [filter]="true" filterBy="anio"  name="curso">
+      <p-dropdown [disabled]="selectedFiltro.key == 1" [options]="cursosDialog" [(ngModel)]="selectedCurso" [filter]="true" filterBy="anio"  name="curso">
         <ng-template pTemplate="selectedItem">
           <div class="country-item country-item-value" *ngIf="selectedCurso">
               <div>{{selectedCurso.anio}}° {{selectedCurso.division}}°</div>

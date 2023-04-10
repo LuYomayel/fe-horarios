@@ -22,11 +22,13 @@ import { HttpInterceptorService } from './services/http-interceptor';
 import {CalendarModule} from 'primeng/calendar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AvatarModule } from 'primeng/avatar';
+import { HeaderComponent } from './header/header.component';
 @NgModule({
   declarations: [
     AppComponent,
     CalendarComponent,
-    LoginComponent
+    LoginComponent,
+    HeaderComponent
   ],
   imports: [
     BrowserModule,
