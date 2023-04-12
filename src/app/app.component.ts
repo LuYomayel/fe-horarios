@@ -27,7 +27,13 @@ export class AppComponent {
       this.primengConfig.ripple = true;
       this.router.events.subscribe((event) => {
         if (event instanceof NavigationEnd) {
-          this.showNavBar = !this.router.url.includes('/login');
+          if(this.router.url.includes('/login') || (this.router.url == '/')){
+            this.showNavBar = false;
+          }else{
+            this.showNavBar = true;
+          }
+          // this.showNavBar = !this.router.url.includes('/login') || !(this.router.url == '/');
+          // console.log('url: ', (this.router.url == '/'))
         }
       });
       this.primengConfig.setTranslation({
