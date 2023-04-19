@@ -5,7 +5,7 @@ import { throwError } from 'rxjs';
 import {map} from 'rxjs/operators';
 import { global } from "./global";
 import { Observable } from "rxjs";
-import { CreateHorarioXCursoDto, CreateProfesoreDto, Curso, EDia, ERoles, ETurno, HorarioXCurso, Materia, Profesor } from "../interfaces/horarios";
+import { CreateHorarioXCursoDto, CreateProfesoreDto, Curso, EDia, ERoles, ETurno, HorarioXCurso, Materia, Profesor, UpdateHorarioXCursoDto } from "../interfaces/horarios";
 import { AppComponent } from "../app.component";
 import { CalendarComponent } from "../calendar/calendar.component";
 import jwtDecode from "jwt-decode";
@@ -66,7 +66,7 @@ export class HorariosService{
       const me = this;
       switch(modulo){
         case 1:
-          return turno == ETurno.mañana ? {start: '07:45' , end: '08:30'} : {start: '12:50' , end: '13:50'}
+          return turno == ETurno.mañana ? {start: '07:30' , end: '08:30'} : {start: '12:50' , end: '13:50'}
         case 2:
           return turno == ETurno.mañana ? {start: '08:30' , end: '09:30'} : {start: '13:50' , end: '14:50'}
         case 3:
@@ -88,7 +88,14 @@ export class HorariosService{
                     const newDate = new Date()
                     const dia = horarioAsignado.dia ? horarioAsignado.dia : EDia.lunes
                     const modulo = horarioAsignado.modulo ? horarioAsignado.modulo : -1;
-                    const profesor = horarioAsignado.profesor ? `${horarioAsignado.profesor.nombre} ${horarioAsignado.profesor.apellido}` : ''
+                    console.log('Array: ', horarioAsignado.arrayProfesores)
+                    let profesor = '';
+                    let tipoProfesor = '';
+                    if(horarioAsignado.arrayProfesores && horarioAsignado.arrayProfesores.length > 0){
+                      profesor = `${horarioAsignado.arrayProfesores[0].profesor.nombre} ${horarioAsignado.arrayProfesores[0].profesor.apellido}`
+                      tipoProfesor = `${horarioAsignado.arrayProfesores[0].tipoProfesor}`
+                    }
+                    // const profesor = horarioAsignado.profesor ? `${horarioAsignado.profesor.nombre} ${horarioAsignado.profesor.apellido}` : ''
                     const objHorario = this.getHorario((horarioAsignado.modulo || -1), (horarioAsignado.curso?.turno[0] || ETurno.noche))
                     // console.log('horarios: ', objHorario)
                     return {
@@ -99,8 +106,8 @@ export class HorariosService{
                       // end: `2023-05-0${this.getNroDia(dia)}T0${modulo+1}:00:00`,
                       description: profesor,
                       extendedProps: {
-                        descripcion: `${horarioAsignado.tipoProfesor}`,
-                        lugar: 'Lugar del evento'
+                        descripcion: `${tipoProfesor}`,
+                        lugar: `${horarioAsignado._id}`
                       }
                     }
                   })
@@ -133,7 +140,7 @@ export class HorariosService{
                     description: profesorNombre,
                     extendedProps: {
                       descripcion: `${horarioAsignado.tipoProfesor}`,
-                      lugar: 'Lugar del evento'
+                      lugar: `${horarioAsignado._id}`
                     }
                   }
                 })
@@ -205,6 +212,18 @@ export class HorariosService{
         )
     }
 
+    editarHorario(horarioAAsignar: UpdateHorarioXCursoDto):Observable<any>{
+      let json = JSON.stringify(horarioAAsignar);
+      let params = 'json='+json;
+      let headers = new HttpHeaders('application/x-www-form-urlencoded');
+      console.log(json)
+      return this._http.put<any>(`${this.url}horario-x-curso`, horarioAAsignar, {headers: {"Content-type":"application/json"}}).pipe(
+          map(
+              result => result
+          )
+      )
+    }
+
     agregarProfesor(dto: CreateProfesoreDto):Observable<any>{
       let json = JSON.stringify(dto);
       let params = 'json='+json;
@@ -236,7 +255,7 @@ export class HorariosService{
       try {
         const token = localStorage.getItem('token') || '';
         const decodedToken: any = jwtDecode(token);
-        console.log(decodedToken)
+        // console.log(decodedToken)
         const roles: ERoles[] = decodedToken.role || [];
         return roles;
       } catch (error) {

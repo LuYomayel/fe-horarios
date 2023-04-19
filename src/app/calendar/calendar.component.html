@@ -46,7 +46,7 @@
   </div>
 </div>
 
-<p-dialog header="Agregar horario" [(visible)]="display" [draggable]="false" [modal]="true">
+<p-dialog [header]="tituloHorario" [(visible)]="display" [draggable]="false" [modal]="true">
   <form class="formulario-horario">
 
     <label for="profesor">Profesor:</label>
@@ -105,7 +105,7 @@
     </div>
 
     <div style="margin-top: 1rem;">
-      <p-button (onClick)="guardarHorario()" class="btn btn-primary">Enviar</p-button>
+      <p-button (onClick)="tituloHorario == 'Editar Horario' ? editarHorario() : guardarHorario()" class="btn btn-primary">Enviar</p-button>
     </div>
   </form>
 </p-dialog>
