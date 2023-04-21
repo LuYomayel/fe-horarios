@@ -82,6 +82,10 @@ export interface UpdateHorarioXCursoDto {
   modulo: number;
   dia: EDia;
   tipoProfesor: ETipoProfesor;
+  arrayProfesores?: {
+    profesor: string;
+    tipoProfesor: ETipoProfesor
+  }[]
 }
 
 export interface CreateProfesoreDto {

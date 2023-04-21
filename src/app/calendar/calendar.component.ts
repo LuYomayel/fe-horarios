@@ -11,6 +11,7 @@ import {MessageService} from 'primeng/api';
 import { PrimeNGConfig } from 'primeng/api';
 import { AuthGuard } from '../services/auth-guard';
 import { Route, Router } from '@angular/router';
+
 interface horarioSemanal {
   modulos: number[];
   dias: EDia[]
@@ -41,18 +42,18 @@ export class CalendarComponent implements OnInit {
     const me = this;
     if(me.roles.includes(ERoles.ADMIN)){
       me.tituloHorario = 'Agregar Horario';
+      console.log('Curso: ', me.selectedCurso)
       me.horarioAAsignar.curso = {...me.selectedCurso};
       me.horarioAAsignar.modulo = modulo;
       me.horarioAAsignar.dia = diaSemana;
-      console.log('Curso: ', me.selectedCurso)
+      me.cursosDialog = me.cursos;
       if(accion == 'AGREGAR'){
-
         if(me.selectedFiltro.key == 1){
           if(modulo == 6 && me.horarioAAsignar.curso.turno.includes(ETurno.tarde)) me.turnoSelected = ETurno.prehora;
           else if(modulo != 6 && me.horarioAAsignar.curso.turno.includes(ETurno.tarde)) me.turnoSelected = ETurno.tarde;
           else me.turnoSelected = ETurno.mañana;
           // me.turnos = me.selectedCurso.turno;
-          me.cursosDialog = me.cursos;
+          me.disableProfesor = false;
         }
         if(me.selectedFiltro.key == 2){
           me.disableProfesor = true;
@@ -99,7 +100,6 @@ export class CalendarComponent implements OnInit {
   selectedFiltroTurno!: any;
   optionsFiltroTurno: ETurno[] = [ETurno.mañana, ETurno.tarde];
   loading: boolean = false;
-  // TODO: Me falta un tipo de profesor.
   // TODO: Cambiar color del evento segun tipo de profesor.
   opcionesTipoProfesor: ETipoProfesor[] = [ETipoProfesor.titular, ETipoProfesor.suplente, ETipoProfesor.provisional, ETipoProfesor.titular_interino]
   selectedTipoProfesor: ETipoProfesor = ETipoProfesor.titular;
@@ -275,6 +275,7 @@ export class CalendarComponent implements OnInit {
         me.materias = result
       },
       error: error => {
+        me.errorAutenticacion(error);
         me.showErrorToast(error.error.message)
         me.loading = false;
       },
@@ -294,6 +295,7 @@ export class CalendarComponent implements OnInit {
         me.profesores = me.profesores.sort((a, b) => a.apellido.localeCompare(b.apellido));
       },
       error: error => {
+        me.errorAutenticacion(error);
         me.showErrorToast(error.error.message)
         me.loading = false;
       },
@@ -325,6 +327,7 @@ export class CalendarComponent implements OnInit {
         me.selectedCurso = me.cursos[0];
       },
       error: error => {
+        me.errorAutenticacion(error);
         me.showErrorToast(error.error.message)
         me.loading = false;
       },
@@ -434,6 +437,7 @@ export class CalendarComponent implements OnInit {
       modulo: me.horarioAAsignar.modulo || -1,
       dia: me.horarioAAsignar.dia || EDia.lunes,
       tipoProfesor: me.selectedTipoProfesor,
+      arrayProfesores: [{profesor: me.horarioAAsignar.profesor?._id || '', tipoProfesor: me.selectedTipoProfesor}]
     }
     console.log('Dto: ', dto);
 
@@ -619,6 +623,9 @@ export class CalendarComponent implements OnInit {
     this.loading = false;
   }
 
+  errorAutenticacion(error: any){
+    if(error.error.statusCode == 401) this.route.navigate(['/login'])
+  }
 }
 
 

@@ -88,7 +88,7 @@ export class HorariosService{
                     const newDate = new Date()
                     const dia = horarioAsignado.dia ? horarioAsignado.dia : EDia.lunes
                     const modulo = horarioAsignado.modulo ? horarioAsignado.modulo : -1;
-                    console.log('Array: ', horarioAsignado.arrayProfesores)
+                    // console.log('Array: ', horarioAsignado.arrayProfesores)
                     let profesor = '';
                     let tipoProfesor = '';
                     if(horarioAsignado.arrayProfesores && horarioAsignado.arrayProfesores.length > 0){
