@@ -54,27 +54,52 @@
       <p-dropdown [options]="materias" [(ngModel)]="selectedMateria" name="materia" [filter]="true" optionLabel="nombre" filterBy="nombre" [showClear]="true" (ngModelChange)="materiaChange($event)"></p-dropdown>
     </div>
 
-    <label for="profesor">Profesor:</label>
-    <div class="contenedor">
-      <p-dropdown [disabled]="disableProfesor == true" [options]="profesores" [(ngModel)]="selectedProfesor" name="profesor" [filter]="true" optionLabel="apellido" filterBy="apellido" [showClear]="true" (ngModelChange)="profesorChange()">
-        <ng-template pTemplate="selectedItem">
-          <div class="country-item country-item-value" *ngIf="selectedProfesor">
-              <div>{{selectedProfesor.nombre}} {{selectedProfesor.apellido}}</div>
+    <div class="profesor-tipo-container">
+      <div class="profesor-container">
+
+        <label for="profesor">Profesor:</label>
+          <div class="contenedor">
+            <p-dropdown class="fixed-width-dropdown" [disabled]="disableProfesor == true" [options]="profesores" [(ngModel)]="selectedProfesor" name="profesor" [filter]="true" optionLabel="apellido" filterBy="apellido" [showClear]="true" (ngModelChange)="profesorChange()">
+              <ng-template pTemplate="selectedItem">
+                <div class="country-item country-item-value" *ngIf="selectedProfesor">
+                  <div>{{selectedProfesor.nombre}} {{selectedProfesor.apellido}}</div>
+                </div>
+              </ng-template>
+              <ng-template let-profesor pTemplate="item">
+                <div class="profesor-item">
+                  <div>{{profesor.nombre}} {{profesor.apellido}}</div>
+                </div>
+              </ng-template>
+            </p-dropdown>
           </div>
-        </ng-template>
-        <ng-template let-profesor pTemplate="item">
-          <div class="profesor-item">
-              <div>{{profesor.nombre}} {{profesor.apellido}}</div>
+        </div>
+
+        <div class="tipo-profesor-container">
+          <label for="horario" class="block">Tipo Profesor:</label>
+          <div class="contenedor">
+            <p-dropdown class="fixed-width-dropdown" [options]="opcionesTipoProfesor" [(ngModel)]="selectedTipoProfesor" name="tipoProfesor" [showClear]="true"></p-dropdown>
           </div>
-        </ng-template>
-      </p-dropdown>
+        </div>
+        <div class="agregar-container" *ngIf="selectedFiltro?.key == 1">
+          <!-- Botón para agregar profesor -->
+          <div class="contenedor">
+            <button pButton pRipple type="button" icon="pi pi-plus" class="p-button-rounded p-button-success p-button-outlined ancho-boton" title="Agregar Profesor" (click)="agregarProfesorArray()"></button>
+            <!-- <p-button  ></p-button> -->
+          </div>
+        </div>
+    </div>
+    <!-- Lista de profesores agregados -->
+    <div *ngFor="let profesor of profesoresAgregados; let i = index;" class="lista-profesores">
+        <div class="lista">
+        <!-- <div *ngIf="selectedFiltro?.key == 1" class="lista"> -->
+          <strong><span>{{ profesor.profesor.nombre }} {{ profesor.profesor.apellido }}</span> - <span>{{ profesor.tipoProfesor }}</span></strong>
+          <!-- <p-button icon="pi pi-times" styleClass="p-button-rounded p-button-danger p-button-text p-button-sm"></p-button> -->
+          <button class="boton-eliminar" (click)="eliminarProfesor(i)">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
     </div>
 
-
-    <label for="horario" class="block">Tipo Profesor:</label>
-    <div class="contenedor">
-      <p-dropdown [options]="opcionesTipoProfesor" [(ngModel)]="selectedTipoProfesor" name="tipoProfesor" [showClear]="true"></p-dropdown>
-    </div>
 
     <label for="curso">Curso:</label>
     <div class="contenedor">

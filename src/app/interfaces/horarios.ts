@@ -56,7 +56,7 @@ export interface HorarioXCurso {
   modulo?: number;
   dia?: EDia;
   tipoProfesor?: ETipoProfesor;
-  arrayProfesores?: {
+  arrayProfesores: {
     profesor: Profesor;
     tipoProfesor: ETipoProfesor
   }[]
@@ -65,10 +65,10 @@ export interface HorarioXCurso {
 export interface CreateHorarioXCursoDto {
   materia: string;
   curso: string;
-  profesor: string;
+  profesor?: string;
   modulo: number;
   dia: EDia;
-  tipoProfesor: ETipoProfesor;
+  tipoProfesor?: ETipoProfesor;
   arrayProfesores?: {
     profesor: string;
     tipoProfesor: ETipoProfesor
@@ -78,10 +78,8 @@ export interface UpdateHorarioXCursoDto {
   _id: string;
   materia: string;
   curso: string;
-  profesor: string;
   modulo: number;
   dia: EDia;
-  tipoProfesor: ETipoProfesor;
   arrayProfesores?: {
     profesor: string;
     tipoProfesor: ETipoProfesor

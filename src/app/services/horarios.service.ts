@@ -133,13 +133,21 @@ export class HorariosService{
                   const modulo = horarioAsignado.modulo ? horarioAsignado.modulo : -1;
                   const profesorNombre = profesor ? `${profesor.nombre} ${profesor.apellido}` : '';
                   const objHorario = this.getHorario((horarioAsignado.modulo || -1), (horarioAsignado.curso?.turno[0] || ETurno.noche))
+
+                  const profesorIndex = horarioAsignado.arrayProfesores.findIndex(array => array.profesor._id == profesor._id)
+
+                  let tipoProfesor = 'ERROR TIPO';
+                  if(profesorIndex != -1){
+                    tipoProfesor = horarioAsignado.arrayProfesores[profesorIndex].tipoProfesor
+                  }
+                  console.log('Tipo profe: ', tipoProfesor)
                   return {
                     title: horarioAsignado.materia?.nombre,
                     start: `2023-05-0${this.getNroDia(dia)}T${objHorario.start}:00`,
                     end: `2023-05-0${this.getNroDia(dia)}T${objHorario.end}:00`,
                     description: profesorNombre,
                     extendedProps: {
-                      descripcion: `${horarioAsignado.tipoProfesor}`,
+                      descripcion: `${tipoProfesor}`,
                       lugar: `${horarioAsignado._id}`
                     }
                   }
@@ -192,13 +200,13 @@ export class HorariosService{
       });
     }
 
-    // getIdHorario(modulo:number, turno: ETurno, dia: EDia): Observable<Horario>{
-    //   return this._http.get<Horario>(`${this.url}horarios/${modulo}/${turno}/${dia}`).pipe(
-    //     map(
-    //         result => result
-    //     )
-    //   )
-    // }
+    getIdHorario(id: string): Observable<any>{
+      return this._http.get<HorarioXCurso>(`${this.url}horario-x-curso/${id}`).pipe(
+        map(
+            result => result
+        )
+      )
+    }
 
     asignarHorario(horarioAAsignar: CreateHorarioXCursoDto):Observable<any>{
         let json = JSON.stringify(horarioAAsignar);
@@ -216,7 +224,7 @@ export class HorariosService{
       let json = JSON.stringify(horarioAAsignar);
       let params = 'json='+json;
       let headers = new HttpHeaders('application/x-www-form-urlencoded');
-      console.log(json)
+      // console.log(json)
       return this._http.put<any>(`${this.url}horario-x-curso`, horarioAAsignar, {headers: {"Content-type":"application/json"}}).pipe(
           map(
               result => result

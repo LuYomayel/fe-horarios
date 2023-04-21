@@ -38,11 +38,12 @@ export class CalendarComponent implements OnInit {
 
   display: boolean = false;
 
-  showDialog(modulo: number, diaSemana: EDia, accion:string) {
+  async showDialog(modulo: number, diaSemana: EDia, accion:string) {
     const me = this;
     if(me.roles.includes(ERoles.ADMIN)){
+      me.profesoresAgregados = [];
       me.tituloHorario = 'Agregar Horario';
-      console.log('Curso: ', me.selectedCurso)
+      // console.log('Curso: ', me.selectedCurso)
       me.horarioAAsignar.curso = {...me.selectedCurso};
       me.horarioAAsignar.modulo = modulo;
       me.horarioAAsignar.dia = diaSemana;
@@ -59,12 +60,14 @@ export class CalendarComponent implements OnInit {
           me.disableProfesor = true;
           if(modulo == 6 && me.selectedFiltroTurno == ETurno.tarde) me.turnos = [ETurno.prehora];
           else me.turnos = [me.selectedFiltroTurno];
+          me.profesoresAgregados = await me.buscarHorario(me.horarioAAsignar._id || '') || []
           me.cursosDialog = me.cursos.filter(curso => curso.turno.includes(me.selectedFiltroTurno))
         }
 
       }else{
         me.tituloHorario = 'Editar Horario';
-
+        me.loading = true;
+        me.profesoresAgregados = await me.buscarHorario(me.horarioAAsignar._id || '') || []
       }
 
       me.display = true;
@@ -123,15 +126,17 @@ export class CalendarComponent implements OnInit {
       dni: 0,
       nombre: '',
       fechaNacimiento: new Date()
-    }
+    },
+    arrayProfesores: []
   };
   tituloHorario: string = '';
   events: any[] = [];
   options!: CalendarOptions;
   weekDays: SelectItem[] = [];
   roles: ERoles[] = [];
-  slotMinTime:string = '07:45'
-  slotMaxTime:string = '12:50'
+  slotMinTime:string = '07:45';
+  slotMaxTime:string = '12:50';
+  profesoresAgregados: any[] = [];
   constructor(
     protected dataService: HorariosService,
     private messageService: MessageService,
@@ -232,7 +237,7 @@ export class CalendarComponent implements OnInit {
         const modulo = this.getNroModulo(hora);
         const profesor = info.event.extendedProps['description'].split(' ');
         me.horarioAAsignar._id = info.event.extendedProps['lugar'];
-        console.log('Lugar', info.event.extendedProps['lugar'])
+        // console.log('Lugar', info.event.extendedProps['lugar'])
         const profeEncontrado = this.profesores.find(profe => profe.nombre.includes(profesor[0]) && profe.apellido.includes(profesor[profesor.length - 1]));
         // this.horarioAAsignar.profesor = this.profesores.find(profe => profe.nombre.includes(profesor[0]) && profe.apellido.includes(profesor[profesor.length - 1]))
         this.selectedProfesor = profeEncontrado;
@@ -340,11 +345,13 @@ export class CalendarComponent implements OnInit {
     const me = this;
     if(me.selectedFiltro.key == 1){
       me.loading = true;
-      me.dataService.getHorarioXCurso(me.selectedCurso.anio, me.selectedCurso.division).subscribe(result => {
-        me.events = result;
-        me.options.eventDisplay = 'block';
-        this.cambiarHorarios();
-        me.loading = false;
+      me.dataService.getHorarioXCurso(me.selectedCurso.anio, me.selectedCurso.division).subscribe({
+        next: result => {
+          me.events = result;
+          me.options.eventDisplay = 'block';
+          this.cambiarHorarios();
+        },
+        complete: () => me.loading = false
       })
     }
   }
@@ -368,9 +375,11 @@ export class CalendarComponent implements OnInit {
 
     if(me.selectedFiltro.key == 2 && me.selectedProfesor){
       me.loading = true;
-      me.dataService.getHorarioXProfesor(me.selectedProfesor, this.selectedFiltroTurno).subscribe(result => {
-        me.events = result;
-        me.loading = false;
+      me.dataService.getHorarioXProfesor(me.selectedProfesor, this.selectedFiltroTurno).subscribe({
+        next: result => {
+          me.events = result;
+        },
+        complete: () => me.loading = false
       })
     }
   }
@@ -387,25 +396,26 @@ export class CalendarComponent implements OnInit {
 
       return;
     }
-
+    const arrayProfesores = this.profesoresAgregados.map(profe => {
+      return {
+        tipoProfesor: profe.tipoProfesor,
+        profesor: profe.profesor._id
+      }
+    })
     const dto: CreateHorarioXCursoDto = {
       curso: me.selectedCurso._id,
       materia: me.horarioAAsignar.materia?._id || '',
-      profesor: me.horarioAAsignar.profesor?._id || '',
       modulo: me.horarioAAsignar.modulo || -1,
       dia: me.horarioAAsignar.dia || EDia.lunes,
-      tipoProfesor: me.selectedTipoProfesor,
-      arrayProfesores: [{tipoProfesor: me.selectedTipoProfesor, profesor: me.horarioAAsignar.profesor?._id || ''}]
+      arrayProfesores
     }
     console.log('Dto agregar: ', dto)
     me.loading = true;
     me.dataService.asignarHorario(dto).subscribe({
       next: value => {
         me.display = false;
-
         if(me.selectedFiltro.key == 1)me.cursoChange();
         if(me.selectedFiltro.key == 2)me.profesorChange();
-
       },
       error: error => {
         me.showErrorToast(error.error.message)
@@ -413,13 +423,6 @@ export class CalendarComponent implements OnInit {
       },
       complete: () => me.loading = false
     })
-    // me.dataService.asignarHorario(dto).subscribe(result => {
-    //   me.display = false;
-    //   me.cursoChange();
-    // }, error => {
-    //   console.log('ERROR: ', error.error.message)
-    //   me.showErrorToast(error.error.message)
-    // })
   }
 
   async editarHorario(){
@@ -428,18 +431,22 @@ export class CalendarComponent implements OnInit {
 
       return;
     }
+    const arrayProfesores = this.profesoresAgregados.map(profe => {
+      return {
+        tipoProfesor: profe.tipoProfesor,
+        profesor: profe.profesor._id
+      }
+    })
     const id = me.horarioAAsignar._id || '';
     const dto: UpdateHorarioXCursoDto = {
       _id: id,
       curso: me.selectedCurso._id,
       materia: me.horarioAAsignar.materia?._id || '',
-      profesor: me.horarioAAsignar.profesor?._id || '',
       modulo: me.horarioAAsignar.modulo || -1,
       dia: me.horarioAAsignar.dia || EDia.lunes,
-      tipoProfesor: me.selectedTipoProfesor,
-      arrayProfesores: [{profesor: me.horarioAAsignar.profesor?._id || '', tipoProfesor: me.selectedTipoProfesor}]
+      arrayProfesores
     }
-    console.log('Dto: ', dto);
+    // console.log('Dto: ', dto);
 
     me.loading = true;
     me.dataService.editarHorario(dto).subscribe({
@@ -625,6 +632,57 @@ export class CalendarComponent implements OnInit {
 
   errorAutenticacion(error: any){
     if(error.error.statusCode == 401) this.route.navigate(['/login'])
+  }
+  agregarProfesorArray() {
+    console.log('Hola')
+    if (this.selectedProfesor && this.selectedTipoProfesor) {
+      const index = this.profesoresAgregados.findIndex(profe => this.selectedTipoProfesor == profe.tipoProfesor)
+      if(index != -1 ) return this.messageService.add({key: 'bc', severity:'error', summary: 'Error', detail: `Ya hay un profesor ${this.selectedTipoProfesor}`});
+      const indexProfe = this.profesoresAgregados.findIndex(profe => profe.profesor._id == this.selectedProfesor?._id)
+
+      if(indexProfe != -1 ) return this.messageService.add({key: 'bc', severity:'error', summary: 'Error', detail: `El profesor: ${this.selectedProfesor?.nombre} ${this.selectedProfesor?.apellido} ya está agregado en la lista`});
+      console.log('Profe: ', this.profesoresAgregados)
+      this.profesoresAgregados.push({
+        profesor: this.selectedProfesor,
+        tipoProfesor: this.selectedTipoProfesor,
+      });
+
+      // Reiniciar los campos
+      this.selectedProfesor = undefined;
+      this.selectedTipoProfesor = ETipoProfesor.titular;
+    }
+  }
+
+  buscarHorario(id: string): Promise<[]>{
+    const me = this;
+    return new Promise( (resolve, reject) => {
+
+      me.dataService.getIdHorario(id).subscribe({
+        next: value => {
+          if(value.arrayProfesores){
+            resolve(value.arrayProfesores)
+          }
+          else resolve([])
+        },
+        error: error => {
+          reject(error)
+        },
+        complete: () => me.loading = false
+      })
+    })
+  }
+
+  eliminarProfesor(index: number) {
+    if(this.selectedFiltro.key == 2){
+      console.log('Profe: ', this.selectedProfesor)
+      if(this.selectedProfesor?._id === this.profesoresAgregados[index].profesor._id){
+        return this.messageService.add({key: 'bc', severity:'error', summary: 'Error', detail: `El profesor: ${this.selectedProfesor?.nombre} ${this.selectedProfesor?.apellido} no se puede eliminar`});
+      }else{
+        this.profesoresAgregados.splice(index, 1);
+      }
+    }else{
+      this.profesoresAgregados.splice(index, 1);
+    }
   }
 }
 
