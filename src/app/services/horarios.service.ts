@@ -5,7 +5,7 @@ import { throwError } from 'rxjs';
 import {map} from 'rxjs/operators';
 import { global } from "./global";
 import { Observable } from "rxjs";
-import { CreateHorarioXCursoDto, CreateProfesoreDto, Curso, EDia, ERoles, ETurno, HorarioXCurso, Materia, Profesor, UpdateHorarioXCursoDto } from "../interfaces/horarios";
+import { CreateHorarioXCursoDto, CreateProfesoreDto, Curso, EDia, ERoles, ETipoProfesor, ETurno, HorarioXCurso, Materia, Profesor, UpdateHorarioXCursoDto } from "../interfaces/horarios";
 import { AppComponent } from "../app.component";
 import { CalendarComponent } from "../calendar/calendar.component";
 import jwtDecode from "jwt-decode";
@@ -80,6 +80,39 @@ export class HorariosService{
       }
     }
 
+    getTipoProfesor(string: any){
+      const me = this;
+      switch(string){
+        case ETipoProfesor.provisional:
+          return 'P';
+        case ETipoProfesor.titular:
+          return 'T';
+        case ETipoProfesor.suplente:
+          return 'S';
+        case ETipoProfesor.titular_interino:
+          return 'TI';
+        default:
+          return 'Error tipo Profe'
+      }
+    }
+
+    getColorEvento(tipoProfe: ETipoProfesor){
+      const me = this;
+      switch(tipoProfe){
+        case ETipoProfesor.provisional:
+          return '#9EFFA3'; //verde
+        case ETipoProfesor.titular:
+          return '#92C9FF'; //azul
+        case ETipoProfesor.suplente:
+          return '#FFA3A3'; // rojo
+        case ETipoProfesor.titular_interino:
+          return '#FFF176'; //amarillo
+        default:
+          return 'Error tipo Profe'
+      }
+
+    }
+
     getHorarioXCurso(anio: number=1, curso:number=1): Observable<Event[]>{
         return this._http.get<HorarioXCurso[]>(`${this.url}horario-x-curso/curso/${anio}/${curso}`).pipe(
             map(
@@ -88,25 +121,26 @@ export class HorariosService{
                     const newDate = new Date()
                     const dia = horarioAsignado.dia ? horarioAsignado.dia : EDia.lunes
                     const modulo = horarioAsignado.modulo ? horarioAsignado.modulo : -1;
-                    // console.log('Array: ', horarioAsignado.arrayProfesores)
-                    let profesor = '';
-                    let tipoProfesor = '';
-                    if(horarioAsignado.arrayProfesores && horarioAsignado.arrayProfesores.length > 0){
-                      profesor = `${horarioAsignado.arrayProfesores[0].profesor.nombre} ${horarioAsignado.arrayProfesores[0].profesor.apellido}`
-                      tipoProfesor = `${horarioAsignado.arrayProfesores[0].tipoProfesor}`
-                    }
-                    // const profesor = horarioAsignado.profesor ? `${horarioAsignado.profesor.nombre} ${horarioAsignado.profesor.apellido}` : ''
+
+                    const arrayNombresProfes = horarioAsignado.arrayProfesores.map( profe => {
+                      return `${this.getTipoProfesor(profe.tipoProfesor)}: ${profe.profesor.nombre} ${profe.profesor.apellido}`
+                    })
+                    const tipoProfesor = horarioAsignado.arrayProfesores[0].tipoProfesor;
+                    const colorEvento = this.getColorEvento(tipoProfesor);
+                    const nombresProfes = arrayNombresProfes.join('<br>')
                     const objHorario = this.getHorario((horarioAsignado.modulo || -1), (horarioAsignado.curso?.turno[0] || ETurno.noche))
-                    // console.log('horarios: ', objHorario)
+
                     return {
                       title: horarioAsignado.materia?.nombre,
                       start: `2023-05-0${this.getNroDia(dia)}T${objHorario.start}:00`,
                       end: `2023-05-0${this.getNroDia(dia)}T${objHorario.end}:00`,
+                      backgroundColor: colorEvento,
+                      borderColor: 'white',
+                      textColor: 'black',
                       // start: `2023-05-0${this.getNroDia(dia)}T0${modulo}:00:00`,
                       // end: `2023-05-0${this.getNroDia(dia)}T0${modulo+1}:00:00`,
-                      description: profesor,
+                      description: nombresProfes,
                       extendedProps: {
-                        descripcion: `${tipoProfesor}`,
                         lugar: `${horarioAsignado._id}`
                       }
                     }
@@ -270,6 +304,14 @@ export class HorariosService{
         console.error('Error decoding token:', error);
         return [];
       }
+    }
+
+    deleteHorario(id:string ): Observable<any>{
+        return this._http.delete<any>(`${this.url}horario-x-curso/${id}`).pipe(
+          map(
+              result => result
+          )
+      )
     }
 
 }

@@ -11,6 +11,7 @@ import {MessageService} from 'primeng/api';
 import { PrimeNGConfig } from 'primeng/api';
 import { AuthGuard } from '../services/auth-guard';
 import { Route, Router } from '@angular/router';
+import { ConfirmationService } from 'primeng/api';
 
 interface horarioSemanal {
   modulos: number[];
@@ -31,7 +32,7 @@ enum EDia {
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
-  providers: [ HorariosService, MessageService ]
+  providers: [ HorariosService, MessageService, ConfirmationService ]
 })
 
 export class CalendarComponent implements OnInit {
@@ -142,7 +143,8 @@ export class CalendarComponent implements OnInit {
     private messageService: MessageService,
     private primengConfig: PrimeNGConfig,
     private authGuard: AuthGuard,
-    private route:Router
+    private route:Router,
+    private confirmationService: ConfirmationService
   ){
     const me = this;
     me.primengConfig.ripple = true;
@@ -250,7 +252,7 @@ export class CalendarComponent implements OnInit {
       eventContent: (info) => {
         const eventTitle = info.event.title;
         const tipoProfesor = this.getTipoProfesor(info.event.extendedProps['descripcion'])
-        const eventDescription = `${tipoProfesor}: ${info.event.extendedProps['description']}`;
+        const eventDescription = `${info.event.extendedProps['description']}`;
         const horas = new Date(info.event.start || '').getUTCHours()
         const minutos = new Date(info.event.start || '').getUTCMinutes()
         return {
@@ -659,6 +661,7 @@ export class CalendarComponent implements OnInit {
 
       me.dataService.getIdHorario(id).subscribe({
         next: value => {
+          console.log('Array: ', value)
           if(value.arrayProfesores){
             resolve(value.arrayProfesores)
           }
@@ -683,6 +686,43 @@ export class CalendarComponent implements OnInit {
     }else{
       this.profesoresAgregados.splice(index, 1);
     }
+  }
+  eliminarHorario(){
+    const me = this;
+    me.loading = true;
+    me.dataService.deleteHorario(me.horarioAAsignar._id || '').subscribe( {
+      next: value => {
+        if(value.deletedCount == 1){
+          me.display = false;
+          this.messageService.add({key: 'bc', severity:'success', summary: 'Exito!', detail: `Se ha eliminado el horario`});
+          if(me.selectedFiltro.key == 1)me.cursoChange();
+          if(me.selectedFiltro.key == 2)me.profesorChange();
+        }else{
+          this.messageService.add({key: 'bc', severity:'error', summary: 'Error!', detail: `No se ha podido eliminar el horario`});
+        }
+        console.log('Value: ', value)
+      },
+      error: error => {
+        me.showErrorToast(error.error.message)
+        me.loading = false;
+      },
+      complete: () => me.loading = false
+    } )
+  }
+
+  mostrarConfirmacion() {
+    this.confirmationService.confirm({
+      message: '¿Estás seguro de que deseas eliminar este horario?',
+      accept: () => {
+        // Acción a realizar si el usuario confirma
+        this.eliminarHorario();
+        console.log('Usuario confirmó');
+      },
+      reject: () => {
+        // Acción a realizar si el usuario rechaza
+        console.log('Usuario rechazó');
+      },
+    });
   }
 }
 

@@ -22,6 +22,7 @@ import { HttpInterceptorService } from './services/http-interceptor';
 import {CalendarModule} from 'primeng/calendar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AvatarModule } from 'primeng/avatar';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { HeaderComponent } from './header/header.component';
 @NgModule({
   declarations: [
@@ -47,7 +48,8 @@ import { HeaderComponent } from './header/header.component';
     ToastModule,
     CalendarModule,
     ProgressSpinnerModule,
-    AvatarModule
+    AvatarModule,
+    ConfirmDialogModule
   ],
   providers: [
     AppComponent,
