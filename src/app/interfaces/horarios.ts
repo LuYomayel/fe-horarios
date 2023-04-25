@@ -90,8 +90,7 @@ export interface UpdateHorarioXCursoDto {
 export interface CreateProfesoreDto {
   nombre: string;
   apellido: string;
-  dni: number;
-  fechaNacimiento: Date;
+  cuil: number;
 }
 
 export interface UpdateCursoDto{

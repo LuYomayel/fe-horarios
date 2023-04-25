@@ -166,16 +166,15 @@
     <label for="horario" class="block">Apellido:</label>
     <input type="text" pInputText  id="apellido" class="form-control" name="apellido" [(ngModel)]="dtoProfesor.apellido" required>
 
-    <label for="horario" class="block">Dni:</label>
+    <label for="horario" class="block">Cuil:</label>
     <div class="contenedor">
-      <p-inputNumber inputId="dni" [(ngModel)]="dtoProfesor.dni" class="form-control" name="dni"></p-inputNumber>
+      <p-inputNumber inputId="dni" [(ngModel)]="dtoProfesor.cuil" class="form-control" name="Cuil"></p-inputNumber>
     </div>
 
-    <label for="horario" class="block">Fecha de nacimiento:</label>
+    <!-- <label for="horario" class="block">Fecha de nacimiento:</label>
     <div class="contenedor">
-      <!-- <p-calendar [(ngModel)]="dtoProfesor.fechaNacimiento" [readonlyInput]="false" name="fechaNacimiento"></p-calendar> -->
       <input class="p-inputtext custom-date-input" type="date" [(ngModel)]="dtoProfesor.fechaNacimiento"  name="fechaNacimiento" />
-    </div>
+    </div> -->
     <!-- <input type="text" pInputText  id="dni" class="form-control" name="dni" [(ngModel)]="dtoProfesor.dni" required> -->
 
     <div style="margin-top: 1rem;">

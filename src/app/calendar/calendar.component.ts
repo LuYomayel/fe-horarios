@@ -494,17 +494,12 @@ export class CalendarComponent implements OnInit {
   dtoProfesor: CreateProfesoreDto ={
     nombre: '',
     apellido: '',
-    dni: 0,
-    fechaNacimiento: new Date()
+    cuil: 0,
   };
   agregarProfesor(){
     const me = this;
 
-    if(!me.esFechaValida()) {
-      me.showErrorToast(`Fecha de nacimiento inválida: el año debe estar entre 1920 y ${new Date().getFullYear()-18}.`)
-      return;
-    }
-    if(!me.esDniValido(me.dtoProfesor.dni.toString())){
+    if(!me.esDniValido(me.dtoProfesor.cuil.toString())){
       me.showErrorToast('Formato de dni inválido.')
       return;
     }
@@ -547,16 +542,10 @@ export class CalendarComponent implements OnInit {
 
   esDniValido(dni:string) {
     // La expresión regular verifica que el DNI tenga entre 1 y 8 dígito
-    const dniRegex = /^\d{7,8}$/;
+    const dniRegex = /^\d{10,11}$/;
 
     // Si el DNI cumple con la expresión regular, es válido
     return dniRegex.test(dni);
-  }
-
-  esFechaValida(){
-    const me = this;
-    const fechaNacimiento = new Date(me.dtoProfesor.fechaNacimiento);
-    return (fechaNacimiento.getFullYear() > 1920 && fechaNacimiento.getFullYear() < (new Date().getFullYear()-18));
   }
 
 
