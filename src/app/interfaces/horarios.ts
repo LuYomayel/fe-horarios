@@ -25,6 +25,7 @@ export interface Curso  {
   anio: number;
   division: number;
   turno: ETurno[];
+  notas?: string;
 }
 
 // export interface Horario  {
@@ -59,7 +60,7 @@ export interface HorarioXCurso {
   arrayProfesores: {
     profesor: Profesor;
     tipoProfesor: ETipoProfesor
-  }[]
+  }[];
 }
 
 export interface CreateHorarioXCursoDto {
@@ -91,6 +92,10 @@ export interface CreateProfesoreDto {
   apellido: string;
   dni: number;
   fechaNacimiento: Date;
+}
+
+export interface UpdateCursoDto{
+  notas: string;
 }
 
 export enum ERoles {

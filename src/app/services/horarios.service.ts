@@ -5,7 +5,7 @@ import { throwError } from 'rxjs';
 import {map} from 'rxjs/operators';
 import { global } from "./global";
 import { Observable } from "rxjs";
-import { CreateHorarioXCursoDto, CreateProfesoreDto, Curso, EDia, ERoles, ETipoProfesor, ETurno, HorarioXCurso, Materia, Profesor, UpdateHorarioXCursoDto } from "../interfaces/horarios";
+import { CreateHorarioXCursoDto, CreateProfesoreDto, Curso, EDia, ERoles, ETipoProfesor, ETurno, HorarioXCurso, Materia, Profesor, UpdateCursoDto, UpdateHorarioXCursoDto } from "../interfaces/horarios";
 import { AppComponent } from "../app.component";
 import { CalendarComponent } from "../calendar/calendar.component";
 import jwtDecode from "jwt-decode";
@@ -123,7 +123,7 @@ export class HorariosService{
                     const modulo = horarioAsignado.modulo ? horarioAsignado.modulo : -1;
 
                     const arrayNombresProfes = horarioAsignado.arrayProfesores.map( profe => {
-                      return `${this.getTipoProfesor(profe.tipoProfesor)}: ${profe.profesor.nombre} ${profe.profesor.apellido}`
+                      return `${this.getTipoProfesor(profe.tipoProfesor)}: ${profe.profesor.nombre || ''} ${profe.profesor.apellido}`
                     })
                     const tipoProfesor = horarioAsignado.arrayProfesores[0].tipoProfesor;
                     const colorEvento = this.getColorEvento(tipoProfesor);
@@ -141,7 +141,8 @@ export class HorariosService{
                       // end: `2023-05-0${this.getNroDia(dia)}T0${modulo+1}:00:00`,
                       description: nombresProfes,
                       extendedProps: {
-                        lugar: `${horarioAsignado._id}`
+                        id_horario: `${horarioAsignado._id}`,
+                        curso: `${horarioAsignado.curso?._id}`
                       }
                     }
                   })
@@ -165,24 +166,31 @@ export class HorariosService{
                   const newDate = new Date()
                   const dia = horarioAsignado.dia ? horarioAsignado.dia : EDia.lunes
                   const modulo = horarioAsignado.modulo ? horarioAsignado.modulo : -1;
-                  const profesorNombre = profesor ? `${profesor.nombre} ${profesor.apellido}` : '';
                   const objHorario = this.getHorario((horarioAsignado.modulo || -1), (horarioAsignado.curso?.turno[0] || ETurno.noche))
 
                   const profesorIndex = horarioAsignado.arrayProfesores.findIndex(array => array.profesor._id == profesor._id)
 
-                  let tipoProfesor = 'ERROR TIPO';
+                  let colorEvento = '';
+                  let tipoProfesor = ETipoProfesor.titular;
                   if(profesorIndex != -1){
                     tipoProfesor = horarioAsignado.arrayProfesores[profesorIndex].tipoProfesor
+                    colorEvento = this.getColorEvento(tipoProfesor);
                   }
-                  console.log('Tipo profe: ', tipoProfesor)
+                  const tipo = this.getTipoProfesor(tipoProfesor);
+                  const profesorNombre = profesor ? `${tipo}: ${profesor.nombre} ${profesor.apellido}` : '';
+                  // console.log('Horario: ', horarioAsignado.curso)
                   return {
                     title: horarioAsignado.materia?.nombre,
                     start: `2023-05-0${this.getNroDia(dia)}T${objHorario.start}:00`,
                     end: `2023-05-0${this.getNroDia(dia)}T${objHorario.end}:00`,
+                    borderColor: 'white',
+                    textColor: 'black',
                     description: profesorNombre,
+                    backgroundColor: colorEvento,
                     extendedProps: {
                       descripcion: `${tipoProfesor}`,
-                      lugar: `${horarioAsignado._id}`
+                      id_horario: `${horarioAsignado._id}`,
+                      curso: `${horarioAsignado.curso?._id}`
                     }
                   }
                 })
@@ -313,5 +321,14 @@ export class HorariosService{
           )
       )
     }
+
+    guardarNota(id:string, body: UpdateCursoDto ): Observable<any>{
+      let json = JSON.stringify(body);
+      return this._http.put<any>(`${this.url}cursos/${id}`, body, {headers: {"Content-type":"application/json"}}).pipe(
+          map(
+              result => result
+          )
+      )
+  }
 
 }

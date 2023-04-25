@@ -12,8 +12,8 @@
             <button *ngIf="selectedFiltro?.key == 2" pButton pRipple type="button" icon="pi pi-plus" class="p-button-rounded p-button-success p-button-outlined" title="Agregar Profesor" (click)="showDialogProfesor()"></button>
 
           <!-- </div> -->
-          </div>
-      <p-listbox *ngIf="selectedFiltro?.key == 2" [options]="profesores" [(ngModel)]="selectedProfesor" (ngModelChange)="profesorChange()" (onDblClick)="quitarSeleccion()" [filter]="true" filterBy="nombre" filterMatchMode="contains" optionLabel="nombre" [listStyle]="{'height':'31.5rem'}">
+    </div>
+      <p-listbox *ngIf="selectedFiltro?.key == 2" [options]="profesores" [(ngModel)]="selectedProfesor" (ngModelChange)="profesorChange()" (onDblClick)="quitarSeleccion()" [filter]="true" filterBy="apellido" filterMatchMode="contains" optionLabel="apellido" [listStyle]="{'height':'31.5rem'}">
         <ng-template pTemplate="selectedItem">
           <div  *ngIf="selectedProfesor">
               <div>{{selectedProfesor.nombre}} {{selectedProfesor.apellido}}</div>
@@ -43,6 +43,12 @@
       <p-dropdown [options]="optionsFiltroTurno" [(ngModel)]="selectedFiltroTurno" (ngModelChange)="filtroTurnoChange($event)" [style]="{'width':'15rem'}" class="mb-2"></p-dropdown>
     </div>
     <full-calendar [options]="options" [events]="events"></full-calendar>
+    <div *ngIf="selectedFiltro.key == 1" class="flex">
+      <label for="horario" class="notas">Notas:</label>
+      <input [disabled]="!editarNota" type="text" pInputText  id="apellido" class="form-control" [(ngModel)]="selectedCurso.notas">
+      <button class="p-button p-button-success btn" *ngIf="editarNota" (click)="guardarNota()">Guardar</button>
+      <button class="p-button p-button-warning btn" *ngIf="!editarNota" (click)="editarNotas()">Editar</button>
+    </div>
   </div>
 </div>
 
@@ -51,7 +57,7 @@
     <div class="header-container">
       <h2><span>{{tituloHorario}}</span></h2>
       <!-- <button pButton pRipple type="button" class="p-button-text p-button-danger" (click)="eliminarHorario()" title="Eliminar este Horario"> -->
-      <button pButton pRipple type="button" class="p-button-text p-button-danger" (click)="mostrarConfirmacion()" title="Eliminar este Horario">
+      <button *ngIf="tituloHorario != 'Agregar Horario'" pButton pRipple type="button" class="p-button-text p-button-danger" (click)="mostrarConfirmacion()" title="Eliminar este Horario">
         <i class="pi pi-trash"></i>
       </button>
     </div>
@@ -93,6 +99,13 @@
           <!-- Botón para agregar profesor -->
           <div class="contenedor">
             <button pButton pRipple type="button" icon="pi pi-plus" class="p-button-rounded p-button-success p-button-outlined ancho-boton" title="Agregar Profesor" (click)="agregarProfesorArray()"></button>
+            <!-- <p-button  ></p-button> -->
+          </div>
+        </div>
+        <div class="agregar-container" *ngIf="selectedFiltro?.key == 2">
+          <!-- Botón para agregar profesor -->
+          <div class="contenedor">
+            <button pButton pRipple type="button" icon="pi pi-pencil" class="p-button-rounded p-button-success p-button-outlined ancho-boton" title="Editar" (click)="editarProfesorArray()"></button>
             <!-- <p-button  ></p-button> -->
           </div>
         </div>

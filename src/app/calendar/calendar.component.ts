@@ -5,7 +5,7 @@ import { CalendarOptions } from '@fullcalendar/core'; // useful for typechecking
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import esLocale from '@fullcalendar/core/locales/es';
-import { CreateHorarioXCursoDto, CreateProfesoreDto, Curso, ERoles, ETipoProfesor, ETurno, ETurnoManana, ETurnoTarde, HorarioXCurso, IUsuario, Materia, Profesor, UpdateHorarioXCursoDto } from '../interfaces/horarios';
+import { CreateHorarioXCursoDto, CreateProfesoreDto, Curso, ERoles, ETipoProfesor, ETurno, ETurnoManana, ETurnoTarde, HorarioXCurso, IUsuario, Materia, Profesor, UpdateCursoDto, UpdateHorarioXCursoDto } from '../interfaces/horarios';
 import { catchError, empty, first, map, of } from 'rxjs';
 import {MessageService} from 'primeng/api';
 import { PrimeNGConfig } from 'primeng/api';
@@ -44,20 +44,26 @@ export class CalendarComponent implements OnInit {
     if(me.roles.includes(ERoles.ADMIN)){
       me.profesoresAgregados = [];
       me.tituloHorario = 'Agregar Horario';
-      // console.log('Curso: ', me.selectedCurso)
-      me.horarioAAsignar.curso = {...me.selectedCurso};
+      // console.log('Curso: ', me.cursos.find( curso => curso._id == me.horarioAAsignar.curso?._id))
+      const curso = me.cursos.find( curso => curso._id == me.horarioAAsignar.curso?._id)
+      console.log('Curso: ', curso)
+      if(curso){
+        me.horarioAAsignar.curso = {...curso} ;
+        me.selectedCurso = curso;
+      }
       me.horarioAAsignar.modulo = modulo;
       me.horarioAAsignar.dia = diaSemana;
       me.cursosDialog = me.cursos;
       if(accion == 'AGREGAR'){
         if(me.selectedFiltro.key == 1){
-          if(modulo == 6 && me.horarioAAsignar.curso.turno.includes(ETurno.tarde)) me.turnoSelected = ETurno.prehora;
-          else if(modulo != 6 && me.horarioAAsignar.curso.turno.includes(ETurno.tarde)) me.turnoSelected = ETurno.tarde;
+          if(modulo == 6 && me.horarioAAsignar.curso &&  me.horarioAAsignar.curso.turno.includes(ETurno.tarde)) me.turnoSelected = ETurno.prehora;
+          else if(modulo != 6 && me.horarioAAsignar.curso && me.horarioAAsignar.curso.turno.includes(ETurno.tarde)) me.turnoSelected = ETurno.tarde;
           else me.turnoSelected = ETurno.mañana;
           // me.turnos = me.selectedCurso.turno;
           me.disableProfesor = false;
         }
         if(me.selectedFiltro.key == 2){
+          console.log('Hola')
           me.disableProfesor = true;
           if(modulo == 6 && me.selectedFiltroTurno == ETurno.tarde) me.turnos = [ETurno.prehora];
           else me.turnos = [me.selectedFiltroTurno];
@@ -68,7 +74,8 @@ export class CalendarComponent implements OnInit {
       }else{
         me.tituloHorario = 'Editar Horario';
         me.loading = true;
-        me.profesoresAgregados = await me.buscarHorario(me.horarioAAsignar._id || '') || []
+        me.profesoresAgregados = await me.buscarHorario(me.horarioAAsignar._id || '') || [];
+        me.selectedFiltro.key == 2 ? me.disableProfesor = true : me.disableProfesor = false;
       }
 
       me.display = true;
@@ -238,12 +245,23 @@ export class CalendarComponent implements OnInit {
         // console.log('Hora: ', hora)
         const modulo = this.getNroModulo(hora);
         const profesor = info.event.extendedProps['description'].split(' ');
-        me.horarioAAsignar._id = info.event.extendedProps['lugar'];
-        // console.log('Lugar', info.event.extendedProps['lugar'])
-        const profeEncontrado = this.profesores.find(profe => profe.nombre.includes(profesor[0]) && profe.apellido.includes(profesor[profesor.length - 1]));
+        me.horarioAAsignar._id = info.event.extendedProps['id_horario'];
+        if(me.horarioAAsignar.curso)me.horarioAAsignar.curso._id = info.event.extendedProps['curso'];
+
+        // console.log('curso', me.horarioAAsignar.curso?._id)
+        const profeEncontrado = this.profesores.find(profe => {
+          if(!profe.nombre){
+            if(!profe.apellido) return false;
+            else {
+              return profe.apellido.includes(profesor[profesor.length - 1])
+            }
+          }
+          return profe.nombre.includes(profesor[1]) && profe.apellido.includes(profesor[profesor.length - 1])
+        });
         // this.horarioAAsignar.profesor = this.profesores.find(profe => profe.nombre.includes(profesor[0]) && profe.apellido.includes(profesor[profesor.length - 1]))
+        // console.log('Profe: ', profeEncontrado)
         this.selectedProfesor = profeEncontrado;
-        // console.log('Profe; ', profeEncontrado)
+
         const diaSemana = me.dataService.getDia(nroDia)
         this.showDialog(modulo, diaSemana, 'EDITAR')
         // console.log('Info: ', info.event);
@@ -346,6 +364,7 @@ export class CalendarComponent implements OnInit {
   cursoChange(){
     const me = this;
     if(me.selectedFiltro.key == 1){
+      console.log('Curso: ', me.selectedCurso)
       me.loading = true;
       me.dataService.getHorarioXCurso(me.selectedCurso.anio, me.selectedCurso.division).subscribe({
         next: result => {
@@ -655,13 +674,22 @@ export class CalendarComponent implements OnInit {
     }
   }
 
+  editarProfesorArray(){
+    console.log('Selected profe: ', this.selectedProfesor)
+    const index = this.profesoresAgregados.findIndex(profe => this.selectedTipoProfesor == profe.tipoProfesor)
+    if(index != -1 ) return this.messageService.add({key: 'bc', severity:'error', summary: 'Error', detail: `Ya hay un profesor ${this.selectedTipoProfesor}`});
+    const indexProfe = this.profesoresAgregados.findIndex(profe => profe.profesor._id == this.selectedProfesor?._id)
+    console.log('Index: ', indexProfe)
+    this.profesoresAgregados[indexProfe].tipoProfesor = this.selectedTipoProfesor;
+  }
+
   buscarHorario(id: string): Promise<[]>{
     const me = this;
     return new Promise( (resolve, reject) => {
 
       me.dataService.getIdHorario(id).subscribe({
         next: value => {
-          console.log('Array: ', value)
+          // console.log('Array: ', value)
           if(value.arrayProfesores){
             resolve(value.arrayProfesores)
           }
@@ -723,6 +751,34 @@ export class CalendarComponent implements OnInit {
         console.log('Usuario rechazó');
       },
     });
+  }
+
+  editarNota:boolean = false;
+  editarNotas(){
+    this.editarNota = !this.editarNota;
+  }
+
+  guardarNota(){
+    this.loading = true;
+    const dto: UpdateCursoDto = {
+      notas: this.selectedCurso.notas || ''
+    }
+    this.dataService.guardarNota(this.selectedCurso._id, dto).subscribe({
+      next: value => {
+        console.log('Value: ', value)
+
+      },
+      error: error => {
+
+        this.editarNotas();
+        this.loading = false;
+      },
+      complete: () => {
+        this.messageService.add({key: 'bc', severity:'success', summary: 'Registro exitoso', detail: 'Nota guardada correctamente!'});
+        this.loading = false;
+        this.editarNotas();
+      }
+    })
   }
 }
 
