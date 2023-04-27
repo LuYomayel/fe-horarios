@@ -1,0 +1,102 @@
+<p-dialog [(visible)]="display" [draggable]="false" [modal]="true" class="dialogo-agregar">
+  <ng-template pTemplate="header">
+    <div class="header-container">
+      <h2><span>{{tituloHorario}}</span></h2>
+      <button *ngIf="tituloHorario != 'Agregar Horario'" pButton pRipple type="button" class="p-button-text p-button-danger" (click)="mostrarConfirmacion()" title="Eliminar este Horario">
+        <i class="pi pi-trash"></i>
+      </button>
+    </div>
+  </ng-template>
+  <form class="formulario-horario">
+    <label for="materia">Materia:</label>
+    <div class="contenedor">
+      <p-dropdown [options]="materias" [(ngModel)]="selectedMateria" name="materia" [filter]="true" optionLabel="nombre" filterBy="nombre" [showClear]="true" (ngModelChange)="materiaChange($event)"></p-dropdown>
+    </div>
+
+    <div class="profesor-tipo-container">
+      <div class="profesor-container">
+
+        <label for="profesor">Profesor:</label>
+          <div class="contenedor">
+            <p-dropdown class="fixed-width-dropdown" [disabled]="disableProfesor == true" [options]="profesores" [(ngModel)]="selectedProfesor" name="profesor" [filter]="true" optionLabel="apellido" filterBy="apellido" [showClear]="true" (ngModelChange)="profesorChange()">
+              <ng-template pTemplate="selectedItem">
+                <div class="country-item country-item-value" *ngIf="selectedProfesor">
+                  <div>{{selectedProfesor.nombre}} {{selectedProfesor.apellido}}</div>
+                </div>
+              </ng-template>
+              <ng-template let-profesor pTemplate="item">
+                <div class="profesor-item">
+                  <div>{{profesor.nombre}} {{profesor.apellido}}</div>
+                </div>
+              </ng-template>
+            </p-dropdown>
+          </div>
+        </div>
+
+        <div class="tipo-profesor-container">
+          <label for="horario" class="block">Tipo Profesor:</label>
+          <div class="contenedor">
+            <p-dropdown class="fixed-width-dropdown" [options]="opcionesTipoProfesor" [(ngModel)]="selectedTipoProfesor" name="tipoProfesor" [showClear]="true"></p-dropdown>
+          </div>
+        </div>
+        <div class="agregar-container" *ngIf="selectedFiltro?.key == 1">
+
+          <div class="contenedor">
+            <button pButton pRipple type="button" icon="pi pi-plus" class="p-button-rounded p-button-success p-button-outlined ancho-boton" title="Agregar Profesor" (click)="agregarProfesorArray()"></button>
+
+          </div>
+        </div>
+        <div class="agregar-container" *ngIf="selectedFiltro?.key == 2">
+
+          <div class="contenedor">
+            <button pButton pRipple type="button" icon="pi pi-pencil" class="p-button-rounded p-button-success p-button-outlined ancho-boton" title="Editar" (click)="editarProfesorArray()"></button>
+
+          </div>
+        </div>
+    </div>
+    <div *ngFor="let profesor of profesoresAgregados; let i = index;" class="lista-profesores">
+        <div class="lista">
+          <strong><span>{{ profesor.profesor.nombre }} {{ profesor.profesor.apellido }}</span> - <span>{{ profesor.tipoProfesor }}</span></strong>
+          <button class="boton-eliminar" (click)="eliminarProfesor(i)">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+    </div>
+
+
+    <label for="curso">Curso:</label>
+    <div class="contenedor">
+      <p-dropdown [disabled]="selectedFiltro.key == 1" [options]="cursosDialog" [(ngModel)]="selectedCurso" [filter]="true" filterBy="anio"  name="curso">
+        <ng-template pTemplate="selectedItem">
+          <div class="country-item country-item-value" *ngIf="selectedCurso">
+              <div>{{selectedCurso.anio}}° {{selectedCurso.division}}°</div>
+          </div>
+        </ng-template>
+        <ng-template let-curso pTemplate="item">
+          <div class="curso-item">
+              <div>{{curso.anio}}° {{curso.division}}°</div>
+          </div>
+        </ng-template>
+      </p-dropdown>
+    </div>
+
+    <label for="horario" class="block">Turno:</label>
+    <div class="contenedor">
+      <p-dropdown [disabled]="true" [options]="turnos" [(ngModel)]="turnoSelected" name="turno" [showClear]="true" (ngModelChange)="turnoChange($event)"></p-dropdown>
+    </div>
+
+    <label for="horario" class="block">Dia:</label>
+    <input [disabled]="true" type="text" pInputText  id="horario" class="form-control" name="dia" [(ngModel)]="selectedDia" required>
+
+    <label for="horario" class="block">Modulo:</label>
+    <input [disabled]="true" type="text" pInputText  id="horario" class="form-control" name="modulo" [(ngModel)]="selectedModulo" required>
+
+    <div style="margin-top: 1rem;">
+      <p-button (onClick)="tituloHorario == 'Editar Horario' ? editarHorario() : guardarHorario()" class="btn btn-primary">Enviar</p-button>
+    </div>
+  </form>
+</p-dialog>
+
+<div *ngIf="loading" class="spinner-overlay">
+  <app-spinner-overlay [loading]="loading"></app-spinner-overlay>
+</div>

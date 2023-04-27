@@ -52,11 +52,13 @@
   </div>
 </div>
 
-<p-dialog [(visible)]="display" [draggable]="false" [modal]="true" class="dialogo-agregar">
+<app-horario-dialog #horarioDialog  [(display)]="display" [tituloHorario]="tituloHorario" ></app-horario-dialog>
+
+<!-- <p-dialog [(visible)]="display" [draggable]="false" [modal]="true" class="dialogo-agregar">
   <ng-template pTemplate="header">
     <div class="header-container">
       <h2><span>{{tituloHorario}}</span></h2>
-      <!-- <button pButton pRipple type="button" class="p-button-text p-button-danger" (click)="eliminarHorario()" title="Eliminar este Horario"> -->
+
       <button *ngIf="tituloHorario != 'Agregar Horario'" pButton pRipple type="button" class="p-button-text p-button-danger" (click)="mostrarConfirmacion()" title="Eliminar este Horario">
         <i class="pi pi-trash"></i>
       </button>
@@ -96,26 +98,23 @@
           </div>
         </div>
         <div class="agregar-container" *ngIf="selectedFiltro?.key == 1">
-          <!-- Botón para agregar profesor -->
+
           <div class="contenedor">
             <button pButton pRipple type="button" icon="pi pi-plus" class="p-button-rounded p-button-success p-button-outlined ancho-boton" title="Agregar Profesor" (click)="agregarProfesorArray()"></button>
-            <!-- <p-button  ></p-button> -->
+
           </div>
         </div>
         <div class="agregar-container" *ngIf="selectedFiltro?.key == 2">
-          <!-- Botón para agregar profesor -->
+
           <div class="contenedor">
             <button pButton pRipple type="button" icon="pi pi-pencil" class="p-button-rounded p-button-success p-button-outlined ancho-boton" title="Editar" (click)="editarProfesorArray()"></button>
-            <!-- <p-button  ></p-button> -->
+
           </div>
         </div>
     </div>
-    <!-- Lista de profesores agregados -->
     <div *ngFor="let profesor of profesoresAgregados; let i = index;" class="lista-profesores">
         <div class="lista">
-        <!-- <div *ngIf="selectedFiltro?.key == 1" class="lista"> -->
           <strong><span>{{ profesor.profesor.nombre }} {{ profesor.profesor.apellido }}</span> - <span>{{ profesor.tipoProfesor }}</span></strong>
-          <!-- <p-button icon="pi pi-times" styleClass="p-button-rounded p-button-danger p-button-text p-button-sm"></p-button> -->
           <button class="boton-eliminar" (click)="eliminarProfesor(i)">
             <i class="pi pi-times"></i>
           </button>
@@ -154,7 +153,7 @@
       <p-button (onClick)="tituloHorario == 'Editar Horario' ? editarHorario() : guardarHorario()" class="btn btn-primary">Enviar</p-button>
     </div>
   </form>
-</p-dialog>
+</p-dialog> -->
 
 <p-dialog header="Agregar Profesor" [(visible)]="displayProfesor" [draggable]="false" [modal]="true" >
 
@@ -189,7 +188,10 @@
 <p-toast position="bottom-right" key="bc"></p-toast>
 
 <div *ngIf="loading" class="spinner-overlay">
-  <p-progressSpinner [style]="{width: '50px', height: '50px'}" strokeWidth="8" fill="none" animationDuration="2s"></p-progressSpinner>
+  <app-spinner-overlay [loading]="loading"></app-spinner-overlay>
 </div>
+
+<!-- <p-progressSpinner [style]="{width: '50px', height: '50px'}" strokeWidth="8" fill="none" animationDuration="2s"></p-progressSpinner> -->
+
 
 <p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle" [breakpoints]="['768px']" [style]="{width: '50vw'}"></p-confirmDialog>

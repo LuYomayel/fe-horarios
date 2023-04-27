@@ -24,12 +24,16 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AvatarModule } from 'primeng/avatar';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { HeaderComponent } from './header/header.component';
+import { HorarioDialogComponent } from './dialogs/horario-dialog/horario-dialog.component';
+import { SpinnerOverlayComponent } from './spinner-overlay/spinner-overlay.component';
 @NgModule({
   declarations: [
     AppComponent,
     CalendarComponent,
     LoginComponent,
-    HeaderComponent
+    HeaderComponent,
+    HorarioDialogComponent,
+    SpinnerOverlayComponent
   ],
   imports: [
     BrowserModule,

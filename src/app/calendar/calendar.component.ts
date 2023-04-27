@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { HorariosService } from '../services/horarios.service';
 import { SelectItem } from 'primeng/api';
 import { CalendarOptions } from '@fullcalendar/core'; // useful for typechecking
@@ -6,12 +6,14 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import esLocale from '@fullcalendar/core/locales/es';
 import { CreateHorarioXCursoDto, CreateProfesoreDto, Curso, ERoles, ETipoProfesor, ETurno, ETurnoManana, ETurnoTarde, HorarioXCurso, IUsuario, Materia, Profesor, UpdateCursoDto, UpdateHorarioXCursoDto } from '../interfaces/horarios';
-import { catchError, empty, first, map, of } from 'rxjs';
+import { Subject, catchError, empty, first, map, of, takeUntil } from 'rxjs';
 import {MessageService} from 'primeng/api';
 import { PrimeNGConfig } from 'primeng/api';
 import { AuthGuard } from '../services/auth-guard';
 import { Route, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
+import { DialogHorariosData, HorarioDialogComponent } from '../dialogs/horario-dialog/horario-dialog.component';
+import { ChangeDetectorRef } from '@angular/core';
 
 interface horarioSemanal {
   modulos: number[];
@@ -35,10 +37,67 @@ enum EDia {
   providers: [ HorariosService, MessageService, ConfirmationService ]
 })
 
-export class CalendarComponent implements OnInit {
+export class CalendarComponent implements OnInit, AfterViewInit {
 
+  dataDialog: DialogHorariosData = {
+    dia: EDia.lunes,
+    modulo: 1,
+    turno: ETurno.mañana,
+    cursos: [],
+    arrayProfesores: [],
+  }
   display: boolean = false;
 
+  @ViewChild('horarioDialog') horarioDialog!: HorarioDialogComponent;
+
+  async showDialog(modulo: number, diaSemana: EDia, accion:string) {
+    const me = this;
+    if(me.roles.includes(ERoles.ADMIN)){
+      me.tituloHorario = 'Agregar Horario';
+      me.dataDialog.modulo = modulo;
+      me.dataDialog.dia = diaSemana;
+
+      me.dataDialog.cursos = [];
+      const curso = me.cursos.find( curso => curso._id == me.horarioAAsignar.curso?._id);
+      if(curso){
+        me.dataDialog.cursos.push(curso);
+      }else{
+        me.dataDialog.cursos.push(me.selectedCurso);
+      }
+      // console.log('CURSO CALENDAR: ', me.dataDialog.cursos)
+      if(accion == 'AGREGAR'){
+        if(me.selectedFiltro.key == 1){
+          me.dataDialog.arrayProfesores = []
+          me.disableProfesor = false;
+        }
+        if(me.selectedFiltro.key == 2){
+          me.disableProfesor = true;
+          me.dataDialog.cursos = me.cursos;
+          me.dataDialog.arrayProfesores = await me.buscarHorario(me.horarioAAsignar._id || '') || [];
+          me.dataDialog.cursos = me.cursos.filter(curso => curso.turno.includes(me.selectedFiltroTurno))
+        }
+      }
+      else{
+        me.tituloHorario = 'Editar Horario';
+        me.dataDialog.arrayProfesores = await me.buscarHorario(me.horarioAAsignar._id || '') || [];
+        me.dataDialog._id = me.horarioAAsignar._id;
+      }
+
+      me.dataDialog.turno = me.dataDialog.cursos.map(curso => curso.turno)[0][0];
+      if(me.dataDialog.turno == ETurno.tarde && me.dataDialog.modulo == 6) me.dataDialog.turno = ETurno.prehora;
+
+      me.horarioDialog.showDialog(me.dataDialog);
+    }else{
+      me.showErrorToast('No tienes permisos para asignar o editar horarios.')
+    }
+  }
+
+  onDialogClose(event:boolean){
+    const me = this;
+    console.log('Cerrado:', event)
+  }
+
+  /*
   async showDialog(modulo: number, diaSemana: EDia, accion:string) {
     const me = this;
     if(me.roles.includes(ERoles.ADMIN)){
@@ -83,7 +142,7 @@ export class CalendarComponent implements OnInit {
       me.showErrorToast('No tienes permisos para asignar horarios.')
     }
   }
-
+  */
   disableProfesor:boolean = false;
   displayProfesor: boolean = false;
   showDialogProfesor() {
@@ -151,7 +210,8 @@ export class CalendarComponent implements OnInit {
     private primengConfig: PrimeNGConfig,
     private authGuard: AuthGuard,
     private route:Router,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private changeDetectorRef: ChangeDetectorRef
   ){
     const me = this;
     me.primengConfig.ripple = true;
@@ -162,6 +222,20 @@ export class CalendarComponent implements OnInit {
       turno: [ETurno.mañana],
       _id: ''
     }
+  }
+
+  private ngUnsubscribe: Subject<void> = new Subject<void>();
+
+  ngAfterViewInit(): void {
+    const me = this;
+    console.log('HorarioDialogComponent:', this.horarioDialog);
+
+    this.horarioDialog.onDialogClose
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(() => {
+        console.log('CERRADO');
+        // Aquí puedes realizar las acciones necesarias cuando el diálogo se cierra
+      });
   }
 
   async ngOnInit() {
@@ -237,6 +311,7 @@ export class CalendarComponent implements OnInit {
         const modulo = this.getNroModulo(hora);
         const diaSemana = me.dataService.getDia(nroDia)
         this.showDialog(modulo, diaSemana, 'AGREGAR')
+
       },
       nowIndicator: true,
       eventClick: (info) =>  {
@@ -264,6 +339,7 @@ export class CalendarComponent implements OnInit {
 
         const diaSemana = me.dataService.getDia(nroDia)
         this.showDialog(modulo, diaSemana, 'EDITAR')
+
         // console.log('Info: ', info.event);
       },
       height: '32rem',
@@ -364,7 +440,7 @@ export class CalendarComponent implements OnInit {
   cursoChange(){
     const me = this;
     if(me.selectedFiltro.key == 1){
-      console.log('Curso: ', me.selectedCurso)
+      // console.log('Curso: ', me.selectedCurso)
       me.loading = true;
       me.dataService.getHorarioXCurso(me.selectedCurso.anio, me.selectedCurso.division).subscribe({
         next: result => {
@@ -504,9 +580,23 @@ export class CalendarComponent implements OnInit {
       return;
     }
     if(this.dtoProfesor.apellido != '' && me.dtoProfesor.nombre != ''){
-      me.dataService.agregarProfesor(me.dtoProfesor).subscribe(() => me.cargarProfesores())
+      me.loading = true;
+      me.dataService.agregarProfesor(me.dtoProfesor).subscribe({
+        next: value => {
+          () => me.cargarProfesores()
+        },
+        error: error => {
+          console.log('Error: ', error)
+          me.showErrorToast(error.error.message)
+          me.loading = false;
+        },
+        complete: () => {
+          me.showBottomCenter();
+          me.loading = false;
+
+        }
+      })
       me.displayProfesor = false;
-      me.showBottomCenter();
     }else{
       me.showErrorToast('Se deben completar todos los campos.')
     }
@@ -678,6 +768,7 @@ export class CalendarComponent implements OnInit {
 
       me.dataService.getIdHorario(id).subscribe({
         next: value => {
+          me.loading = false
           // console.log('Array: ', value)
           if(value.arrayProfesores){
             resolve(value.arrayProfesores)
