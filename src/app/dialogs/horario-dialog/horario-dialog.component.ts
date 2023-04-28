@@ -14,6 +14,8 @@ export interface DialogHorariosData{
     tipoProfesor: ETipoProfesor
   }[];
   _id?: string;
+  profesor?: Profesor;
+  materia?: string;
 }
 
 @Component({
@@ -26,7 +28,7 @@ export class HorarioDialogComponent implements OnInit {
   @Input() display: boolean = false;
   @Input() tituloHorario: string = '';
   @Output() displayChange: EventEmitter<boolean> = new EventEmitter();
-  @Output() onClose: EventEmitter<boolean> = new EventEmitter();
+  @Output() onClose: EventEmitter<void> = new EventEmitter();
   @Output() onDialogClose: EventEmitter<void> = new EventEmitter();
 
 
@@ -46,6 +48,7 @@ export class HorarioDialogComponent implements OnInit {
 
   cursosDialog: Curso[] = []
   selectedCurso!: Curso;
+  disableCursos: boolean = true;
 
   turnos: ETurno[] = [ETurno.mañana, ETurno.tarde, ETurno.prehora];
   turnoSelected!: ETurno;
@@ -66,28 +69,46 @@ export class HorarioDialogComponent implements OnInit {
 
   ngOnInit(): void {
     const me = this;
-    me.cargarMaterias();
-    me.cargarProfesores();
-    // me.cargarCurso();
+    this.loadData();
+
+  }
+
+  private async loadData(): Promise<void> {
+    await Promise.all([
+      this.cargarMaterias(),
+      this.cargarProfesores(),
+    ]);
   }
 
   // Cerrar y abrir dialogo
   closeDialog() {
+    console.log('Close: ')
     this.display = false;
     this.displayChange.emit(this.display);
-    this.onClose.emit(false); // emitir el evento aquí
+    this.onClose.emit(); // emitir el evento aquí
   }
 
 
   showDialog(horario : DialogHorariosData) {
     const me = this;
+    me.loading = false;
     // console.log('Horario desde hijo: ', horario.turno)
     me.profesoresAgregados = horario.arrayProfesores;
     me.cursosDialog = horario.cursos;
     me.turnoSelected = horario.turno;
     me.selectedDia = horario.dia;
     me.selectedModulo = horario.modulo;
+    if(horario.materia) me.selectedMateria = me.materias.filter(result => horario.materia == result.nombre)[0];
     if(horario._id) me._id = horario._id;
+    if(horario.profesor) {
+      me.disableProfesor = true;
+      me.disableCursos = false;
+      me.selectedProfesor = horario.profesor;
+      me.profesoresAgregados = [{profesor: horario.profesor, tipoProfesor: ETipoProfesor.titular}];
+    }else{
+      me.disableCursos = true;
+      me.disableProfesor = false;
+    }
     this.display = true;
   }
 
@@ -174,7 +195,7 @@ export class HorarioDialogComponent implements OnInit {
       arrayProfesores
     }
     console.log('Dto agregar: ', dto)
-    return;
+    // return;
     me.loading = true;
     me.dataService.asignarHorario(dto).subscribe({
       next: value => {
@@ -184,7 +205,13 @@ export class HorarioDialogComponent implements OnInit {
         // if(me.selectedFiltro.key == 2)me.profesorChange();
       },
       error: error => {
-        me.showErrorToast(error.error.message)
+        const mensaje = error.error.message;
+        const mensaje2 = error.error.message.error;
+        if(mensaje2 && typeof mensaje2 == 'string'){
+          me.showErrorToast(mensaje2)
+        }else{
+          me.showErrorToast(mensaje)
+        }
         me.loading = false;
       },
       complete: () => me.loading = false
@@ -213,7 +240,7 @@ export class HorarioDialogComponent implements OnInit {
       arrayProfesores
     }
     console.log('Dto: ', dto);
-return;
+// return;
     me.loading = true;
     me.dataService.editarHorario(dto).subscribe({
       next: value => {
@@ -278,18 +305,6 @@ return;
     }
   }
 
-  materiaChange(event: any){
-
-  }
-
-  profesorChange(){
-
-  }
-
-  turnoChange(event: any){
-
-  }
-
   eliminarHorario(){
     const me = this;
     me.loading = true;
@@ -339,8 +354,8 @@ return;
   showSuccessToast(message: string) {
     this.messageService.add({
       key: 'bc',
-      severity: 'error',
-      summary: 'Error',
+      severity: 'success',
+      summary: 'Exito!',
       detail: message,
     });
   }

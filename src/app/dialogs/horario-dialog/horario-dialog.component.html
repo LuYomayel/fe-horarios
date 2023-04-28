@@ -1,4 +1,4 @@
-<p-dialog [(visible)]="display" [draggable]="false" [modal]="true" class="dialogo-agregar">
+<p-dialog [(visible)]="display" [draggable]="false" [modal]="true" class="dialogo-agregar" (onHide)="closeDialog()">
   <ng-template pTemplate="header">
     <div class="header-container">
       <h2><span>{{tituloHorario}}</span></h2>
@@ -10,7 +10,7 @@
   <form class="formulario-horario">
     <label for="materia">Materia:</label>
     <div class="contenedor">
-      <p-dropdown [options]="materias" [(ngModel)]="selectedMateria" name="materia" [filter]="true" optionLabel="nombre" filterBy="nombre" [showClear]="true" (ngModelChange)="materiaChange($event)"></p-dropdown>
+      <p-dropdown [options]="materias" [(ngModel)]="selectedMateria" name="materia" [filter]="true" optionLabel="nombre" filterBy="nombre" [showClear]="true"></p-dropdown>
     </div>
 
     <div class="profesor-tipo-container">
@@ -18,7 +18,7 @@
 
         <label for="profesor">Profesor:</label>
           <div class="contenedor">
-            <p-dropdown class="fixed-width-dropdown" [disabled]="disableProfesor == true" [options]="profesores" [(ngModel)]="selectedProfesor" name="profesor" [filter]="true" optionLabel="apellido" filterBy="apellido" [showClear]="true" (ngModelChange)="profesorChange()">
+            <p-dropdown class="fixed-width-dropdown" [disabled]="disableProfesor == true" [options]="profesores" [(ngModel)]="selectedProfesor" name="profesor" [filter]="true" optionLabel="apellido" filterBy="apellido" [showClear]="true">
               <ng-template pTemplate="selectedItem">
                 <div class="country-item country-item-value" *ngIf="selectedProfesor">
                   <div>{{selectedProfesor.nombre}} {{selectedProfesor.apellido}}</div>
@@ -39,14 +39,14 @@
             <p-dropdown class="fixed-width-dropdown" [options]="opcionesTipoProfesor" [(ngModel)]="selectedTipoProfesor" name="tipoProfesor" [showClear]="true"></p-dropdown>
           </div>
         </div>
-        <div class="agregar-container" *ngIf="selectedFiltro?.key == 1">
+        <div class="agregar-container" *ngIf="disableCursos">
 
           <div class="contenedor">
             <button pButton pRipple type="button" icon="pi pi-plus" class="p-button-rounded p-button-success p-button-outlined ancho-boton" title="Agregar Profesor" (click)="agregarProfesorArray()"></button>
 
           </div>
         </div>
-        <div class="agregar-container" *ngIf="selectedFiltro?.key == 2">
+        <div class="agregar-container" *ngIf="!disableCursos">
 
           <div class="contenedor">
             <button pButton pRipple type="button" icon="pi pi-pencil" class="p-button-rounded p-button-success p-button-outlined ancho-boton" title="Editar" (click)="editarProfesorArray()"></button>
@@ -66,7 +66,7 @@
 
     <label for="curso">Curso:</label>
     <div class="contenedor">
-      <p-dropdown [disabled]="selectedFiltro.key == 1" [options]="cursosDialog" [(ngModel)]="selectedCurso" [filter]="true" filterBy="anio"  name="curso">
+      <p-dropdown [disabled]="disableCursos" [options]="cursosDialog" [(ngModel)]="selectedCurso" [filter]="true" filterBy="anio"  name="curso">
         <ng-template pTemplate="selectedItem">
           <div class="country-item country-item-value" *ngIf="selectedCurso">
               <div>{{selectedCurso.anio}}° {{selectedCurso.division}}°</div>
@@ -82,7 +82,7 @@
 
     <label for="horario" class="block">Turno:</label>
     <div class="contenedor">
-      <p-dropdown [disabled]="true" [options]="turnos" [(ngModel)]="turnoSelected" name="turno" [showClear]="true" (ngModelChange)="turnoChange($event)"></p-dropdown>
+      <p-dropdown [disabled]="true" [options]="turnos" [(ngModel)]="turnoSelected" name="turno" [showClear]="true"></p-dropdown>
     </div>
 
     <label for="horario" class="block">Dia:</label>
