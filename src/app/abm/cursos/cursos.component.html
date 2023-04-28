@@ -1,0 +1,30 @@
+<div class="container">
+  <h1>Cursos</h1>
+  <p-table [value]="cursos" [tableStyle]="{ 'min-width': '20rem' }"
+  [paginator]="true"
+  [rows]="10"
+  [rowsPerPageOptions]="[10, 25, 50]"
+  [scrollable]="true"
+  scrollHeight="30rem">
+    <ng-template pTemplate="header">
+        <tr>
+            <th>Curso</th>
+            <th>Turno</th>
+            <th class="acciones-column">Acciones</th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-curso>
+        <tr>
+            <td>{{ curso.anio }}° {{ curso.division }}°</td>
+            <td>{{ curso.turno[0] }}</td>
+            <td class="acciones-column">
+              <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-warning p-button-outlined" (onClick)="editar(curso._id)"></p-button> &nbsp;
+              <p-button icon="pi pi-times-circle" styleClass="p-button-rounded p-button-danger p-button-outlined" (onClick)="eliminar(curso._id)"></p-button>
+            </td>
+        </tr>
+    </ng-template>
+  </p-table>
+</div>
+<div *ngIf="loading" class="spinner-overlay">
+  <app-spinner-overlay [loading]="loading"></app-spinner-overlay>
+</div>
