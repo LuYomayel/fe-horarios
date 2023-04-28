@@ -14,6 +14,7 @@ import { Route, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { DialogHorariosData, HorarioDialogComponent } from '../dialogs/horario-dialog/horario-dialog.component';
 import { ChangeDetectorRef } from '@angular/core';
+import { AgregarProfesorDialogComponent } from '../dialogs/agregar-profesor-dialog/agregar-profesor-dialog.component';
 
 interface horarioSemanal {
   modulos: number[];
@@ -45,14 +46,20 @@ export class CalendarComponent implements OnInit, AfterViewInit {
     turno: ETurno.mañana,
     cursos: [],
     arrayProfesores: [],
+    profesor: undefined
   }
-  display: boolean = false;
 
   @ViewChild('horarioDialog') horarioDialog!: HorarioDialogComponent;
+  @ViewChild('agregarProfesorDialog') agregarProfesorDialog!: AgregarProfesorDialogComponent;
 
+  showagregarProfesorDialog(){
+    this.agregarProfesorDialog.showDialog();
+  }
   async showDialog(modulo: number, diaSemana: EDia, accion:string) {
     const me = this;
+
     if(me.roles.includes(ERoles.ADMIN)){
+      // me.loading = true;
       me.tituloHorario = 'Agregar Horario';
       me.dataDialog.modulo = modulo;
       me.dataDialog.dia = diaSemana;
@@ -64,95 +71,30 @@ export class CalendarComponent implements OnInit, AfterViewInit {
       }else{
         me.dataDialog.cursos.push(me.selectedCurso);
       }
+      console.log('Filtro: ', me.selectedFiltro)
       // console.log('CURSO CALENDAR: ', me.dataDialog.cursos)
-      if(accion == 'AGREGAR'){
-        if(me.selectedFiltro.key == 1){
-          me.dataDialog.arrayProfesores = []
-          me.disableProfesor = false;
-        }
-        if(me.selectedFiltro.key == 2){
-          me.disableProfesor = true;
-          me.dataDialog.cursos = me.cursos;
-          me.dataDialog.arrayProfesores = await me.buscarHorario(me.horarioAAsignar._id || '') || [];
-          me.dataDialog.cursos = me.cursos.filter(curso => curso.turno.includes(me.selectedFiltroTurno))
-        }
+      me.dataDialog.arrayProfesores = []
+      me.dataDialog.profesor = undefined;
+      if(accion == 'AGREGAR' && me.selectedFiltro.key == 2){
+        me.dataDialog.profesor = me.selectedProfesor;
+
+        me.dataDialog.cursos = me.cursos.filter(curso => curso.turno.includes(me.selectedFiltroTurno))
       }
-      else{
+      else if(accion == 'EDITAR'){
         me.tituloHorario = 'Editar Horario';
+
         me.dataDialog.arrayProfesores = await me.buscarHorario(me.horarioAAsignar._id || '') || [];
         me.dataDialog._id = me.horarioAAsignar._id;
       }
 
       me.dataDialog.turno = me.dataDialog.cursos.map(curso => curso.turno)[0][0];
       if(me.dataDialog.turno == ETurno.tarde && me.dataDialog.modulo == 6) me.dataDialog.turno = ETurno.prehora;
-
+      console.log('Data: ', me.dataDialog.profesor)
       me.horarioDialog.showDialog(me.dataDialog);
+      me.loading=false;
     }else{
       me.showErrorToast('No tienes permisos para asignar o editar horarios.')
     }
-  }
-
-  onDialogClose(event:boolean){
-    const me = this;
-    console.log('Cerrado:', event)
-  }
-
-  /*
-  async showDialog(modulo: number, diaSemana: EDia, accion:string) {
-    const me = this;
-    if(me.roles.includes(ERoles.ADMIN)){
-      me.profesoresAgregados = [];
-      me.tituloHorario = 'Agregar Horario';
-      // console.log('Curso: ', me.cursos.find( curso => curso._id == me.horarioAAsignar.curso?._id))
-      const curso = me.cursos.find( curso => curso._id == me.horarioAAsignar.curso?._id)
-      console.log('Curso: ', curso)
-      if(curso){
-        me.horarioAAsignar.curso = {...curso} ;
-        me.selectedCurso = curso;
-      }
-      me.horarioAAsignar.modulo = modulo;
-      me.horarioAAsignar.dia = diaSemana;
-      me.cursosDialog = me.cursos;
-      if(accion == 'AGREGAR'){
-        if(me.selectedFiltro.key == 1){
-          if(modulo == 6 && me.horarioAAsignar.curso &&  me.horarioAAsignar.curso.turno.includes(ETurno.tarde)) me.turnoSelected = ETurno.prehora;
-          else if(modulo != 6 && me.horarioAAsignar.curso && me.horarioAAsignar.curso.turno.includes(ETurno.tarde)) me.turnoSelected = ETurno.tarde;
-          else me.turnoSelected = ETurno.mañana;
-          // me.turnos = me.selectedCurso.turno;
-          me.disableProfesor = false;
-        }
-        if(me.selectedFiltro.key == 2){
-          console.log('Hola')
-          me.disableProfesor = true;
-          if(modulo == 6 && me.selectedFiltroTurno == ETurno.tarde) me.turnos = [ETurno.prehora];
-          else me.turnos = [me.selectedFiltroTurno];
-          me.profesoresAgregados = await me.buscarHorario(me.horarioAAsignar._id || '') || []
-          me.cursosDialog = me.cursos.filter(curso => curso.turno.includes(me.selectedFiltroTurno))
-        }
-
-      }else{
-        me.tituloHorario = 'Editar Horario';
-        me.loading = true;
-        me.profesoresAgregados = await me.buscarHorario(me.horarioAAsignar._id || '') || [];
-        me.selectedFiltro.key == 2 ? me.disableProfesor = true : me.disableProfesor = false;
-      }
-
-      me.display = true;
-    }else{
-      me.showErrorToast('No tienes permisos para asignar horarios.')
-    }
-  }
-  */
-  disableProfesor:boolean = false;
-  displayProfesor: boolean = false;
-  showDialogProfesor() {
-    const me = this;
-    if(me.roles.includes(ERoles.ADMIN)){
-      me.displayProfesor = true;
-    }else{
-      me.showErrorToast('No tienes permisos para agregar profesores.')
-    }
-
   }
 
   optionsFiltro: any[] = [
@@ -199,19 +141,14 @@ export class CalendarComponent implements OnInit, AfterViewInit {
   tituloHorario: string = '';
   events: any[] = [];
   options!: CalendarOptions;
-  weekDays: SelectItem[] = [];
   roles: ERoles[] = [];
   slotMinTime:string = '07:45';
   slotMaxTime:string = '12:50';
-  profesoresAgregados: any[] = [];
   constructor(
     protected dataService: HorariosService,
     private messageService: MessageService,
     private primengConfig: PrimeNGConfig,
-    private authGuard: AuthGuard,
     private route:Router,
-    private confirmationService: ConfirmationService,
-    private changeDetectorRef: ChangeDetectorRef
   ){
     const me = this;
     me.primengConfig.ripple = true;
@@ -228,14 +165,15 @@ export class CalendarComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     const me = this;
-    console.log('HorarioDialogComponent:', this.horarioDialog);
+    this.horarioDialog.onClose.subscribe(() => {
+      if(me.selectedFiltro.key == 1)me.cursoChange();
+      if(me.selectedFiltro.key == 2)me.profesorChange();
+      // Aquí puedes realizar las acciones necesarias cuando el diálogo se cierra
+    });
 
-    this.horarioDialog.onDialogClose
-      .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe(() => {
-        console.log('CERRADO');
-        // Aquí puedes realizar las acciones necesarias cuando el diálogo se cierra
-      });
+    this.agregarProfesorDialog.displayChange.subscribe( () => {
+      this.profesorChange();
+    })
   }
 
   async ngOnInit() {
@@ -252,12 +190,6 @@ export class CalendarComponent implements OnInit, AfterViewInit {
       slotDuration: '01:01',
       slotMinTime: this.slotMinTime,
       slotMaxTime: this.slotMaxTime,
-      // slotMinTime: '00:45:00',
-      // slotMaxTime: '23:50:00',
-      // slotLabelFormat: {
-      //   hour: 'numeric',
-      //   meridiem: false
-      // },
       slotLabelFormat: (dateObj) => {
         const currentHour = dateObj.date.hour;
         const currentMinute = dateObj.date.minute;
@@ -291,7 +223,6 @@ export class CalendarComponent implements OnInit, AfterViewInit {
             hourNumber = ETurnoTarde.MODULO_5;
           }
         }
-        // console.log('Hour: ', hourNumber, currentHour, currentMinute)
         return hourNumber;
       },
       dayHeaderFormat: {
@@ -317,13 +248,12 @@ export class CalendarComponent implements OnInit, AfterViewInit {
       eventClick: (info) =>  {
         const nroDia = new Date(info.event.start || '').getUTCDate()
         const hora = new Date(info.event.start || '').getUTCHours()
-        // console.log('Hora: ', hora)
+        console.log('Title: ', info.event.title);
+        me.dataDialog.materia = info.event.title;
         const modulo = this.getNroModulo(hora);
         const profesor = info.event.extendedProps['description'].split(' ');
         me.horarioAAsignar._id = info.event.extendedProps['id_horario'];
         if(me.horarioAAsignar.curso)me.horarioAAsignar.curso._id = info.event.extendedProps['curso'];
-
-        // console.log('curso', me.horarioAAsignar.curso?._id)
         const profeEncontrado = this.profesores.find(profe => {
           if(!profe.nombre){
             if(!profe.apellido) return false;
@@ -333,14 +263,10 @@ export class CalendarComponent implements OnInit, AfterViewInit {
           }
           return profe.nombre.includes(profesor[1]) && profe.apellido.includes(profesor[profesor.length - 1])
         });
-        // this.horarioAAsignar.profesor = this.profesores.find(profe => profe.nombre.includes(profesor[0]) && profe.apellido.includes(profesor[profesor.length - 1]))
-        // console.log('Profe: ', profeEncontrado)
         this.selectedProfesor = profeEncontrado;
 
         const diaSemana = me.dataService.getDia(nroDia)
         this.showDialog(modulo, diaSemana, 'EDITAR')
-
-        // console.log('Info: ', info.event);
       },
       height: '32rem',
       eventContent: (info) => {
@@ -359,29 +285,9 @@ export class CalendarComponent implements OnInit, AfterViewInit {
     await this.dataService.getHorarioXCurso().subscribe(result => {
       this.events = result;
     })
-    me.cargarMaterias();
     me.cargarProfesores();
     me.cargarCurso();
 
-  }
-
-  materias: Materia[] = []
-  selectedMateria!: Materia;
-  cargarMaterias(){
-    const me = this;
-    me.loading = true;
-    me.loading = true;
-    me.dataService.getMaterias().subscribe({
-      next: result => {
-        me.materias = result
-      },
-      error: error => {
-        me.errorAutenticacion(error);
-        me.showErrorToast(error.error.message)
-        me.loading = false;
-      },
-      complete: () => me.loading = false
-    })
   }
 
   profesores: Profesor[] = []
@@ -460,11 +366,6 @@ export class CalendarComponent implements OnInit, AfterViewInit {
     this.cambiarHorarios();
   }
 
-  materiaChange(event: Materia){
-    const me = this;
-    me.horarioAAsignar.materia = event;
-  }
-
   profesorChange(){
     const me = this;
 
@@ -481,136 +382,20 @@ export class CalendarComponent implements OnInit, AfterViewInit {
     }
   }
 
-  quitarSeleccion(){
-    const me = this;
-    me.horarioAAsignar.profesor = undefined;
-    // me.selectedProfesor = undefined;
-  }
-
-  async guardarHorario(){
-    const me = this;
-    if(!me.validarCampos()) {
-
-      return;
-    }
-    const arrayProfesores = this.profesoresAgregados.map(profe => {
-      return {
-        tipoProfesor: profe.tipoProfesor,
-        profesor: profe.profesor._id
-      }
-    })
-    const dto: CreateHorarioXCursoDto = {
-      curso: me.selectedCurso._id,
-      materia: me.horarioAAsignar.materia?._id || '',
-      modulo: me.horarioAAsignar.modulo || -1,
-      dia: me.horarioAAsignar.dia || EDia.lunes,
-      arrayProfesores
-    }
-    console.log('Dto agregar: ', dto)
-    me.loading = true;
-    me.dataService.asignarHorario(dto).subscribe({
-      next: value => {
-        me.display = false;
-        if(me.selectedFiltro.key == 1)me.cursoChange();
-        if(me.selectedFiltro.key == 2)me.profesorChange();
-      },
-      error: error => {
-        me.showErrorToast(error.error.message)
-        me.loading = false;
-      },
-      complete: () => me.loading = false
-    })
-  }
-
-  async editarHorario(){
-    const me = this;
-    if(!me.validarCampos()) {
-
-      return;
-    }
-    const arrayProfesores = this.profesoresAgregados.map(profe => {
-      return {
-        tipoProfesor: profe.tipoProfesor,
-        profesor: profe.profesor._id
-      }
-    })
-    const id = me.horarioAAsignar._id || '';
-    const dto: UpdateHorarioXCursoDto = {
-      _id: id,
-      curso: me.selectedCurso._id,
-      materia: me.horarioAAsignar.materia?._id || '',
-      modulo: me.horarioAAsignar.modulo || -1,
-      dia: me.horarioAAsignar.dia || EDia.lunes,
-      arrayProfesores
-    }
-    // console.log('Dto: ', dto);
-
-    me.loading = true;
-    me.dataService.editarHorario(dto).subscribe({
-      next: value => {
-        me.display = false;
-
-        if(me.selectedFiltro.key == 1)me.cursoChange();
-        if(me.selectedFiltro.key == 2)me.profesorChange();
-
-      },
-      error: error => {
-        me.showErrorToast(error.error.message)
-        me.loading = false;
-      },
-      complete: () => me.loading = false
-    })
-  }
-
-  validarCampos(){
-    let validado: boolean = true;
-    return validado;
-  }
-
-  dtoProfesor: CreateProfesoreDto ={
-    nombre: '',
-    apellido: '',
-    cuil: 0,
-  };
-  agregarProfesor(){
-    const me = this;
-
-    if(!me.esDniValido(me.dtoProfesor.cuil.toString())){
-      me.showErrorToast('Formato de dni inválido.')
-      return;
-    }
-    if(this.dtoProfesor.apellido != '' && me.dtoProfesor.nombre != ''){
-      me.loading = true;
-      me.dataService.agregarProfesor(me.dtoProfesor).subscribe({
-        next: value => {
-          () => me.cargarProfesores()
-        },
-        error: error => {
-          console.log('Error: ', error)
-          me.showErrorToast(error.error.message)
-          me.loading = false;
-        },
-        complete: () => {
-          me.showBottomCenter();
-          me.loading = false;
-
-        }
-      })
-      me.displayProfesor = false;
-    }else{
-      me.showErrorToast('Se deben completar todos los campos.')
-    }
-  }
-
-  showBottomCenter() {
-    this.messageService.add({key: 'bc', severity:'success', summary: 'Registro exitoso', detail: 'Profesor guardado correctamente!'});
-  }
-
   showErrorToast(message: string) {
     this.messageService.add({
       key: 'bc',
       severity: 'error',
       summary: 'Error',
+      detail: message,
+    });
+  }
+
+  showSuccessToast(message: string) {
+    this.messageService.add({
+      key: 'bc',
+      severity: 'success',
+      summary: 'Exito!',
       detail: message,
     });
   }
@@ -630,21 +415,15 @@ export class CalendarComponent implements OnInit, AfterViewInit {
     })
   }
 
-  esDniValido(dni:string) {
-    // La expresión regular verifica que el DNI tenga entre 1 y 8 dígito
-    const dniRegex = /^\d{10,11}$/;
-
-    // Si el DNI cumple con la expresión regular, es válido
-    return dniRegex.test(dni);
-  }
-
 
   getNroModulo(modulo:number){
     const me = this;
-    // console.log('Modulo: ', modulo)
-    if(this.selectedCurso.turno.includes(ETurno.tarde) && modulo == 11 && this.selectedFiltro.key == 1) return 6;
-    if(modulo == 11 && this.selectedFiltro.key == 2 && this.selectedFiltroTurno == ETurno.tarde) return 6;
-    if(modulo == 12 && this.selectedCurso.turno.includes(ETurno.mañana)) return 5;
+    if(me.selectedFiltro.key == 1){
+      if(this.selectedCurso.turno.includes(ETurno.tarde) && modulo == 11 && this.selectedFiltro.key == 1) return 6;
+      if(modulo == 12 && this.selectedCurso.turno.includes(ETurno.mañana)) return 5;
+    }else if(me.selectedFiltro.key == 2){
+      if(modulo == 11  && this.selectedFiltroTurno == ETurno.tarde) return 6;
+    }
     switch(modulo){
       case 7:
       case 12:
@@ -714,13 +493,11 @@ export class CalendarComponent implements OnInit, AfterViewInit {
   }
 
 
-  imprimir(){
+  async imprimir(){
     const me = this;
-    me.dataService.verPdf(me.selectedCurso.anio, me.selectedCurso.division)
-    // .subscribe({
-    //   next: (value:any) => console.log('Value: ', value),
-    //   error: (error:any) => console.log('Error 123: ', error)
-    // })
+    me.loading = true;
+    await me.dataService.verPdf(me.selectedCurso.anio, me.selectedCurso.division)
+    me.loading = false;
   }
 
   cerrarSesion(){
@@ -732,34 +509,6 @@ export class CalendarComponent implements OnInit, AfterViewInit {
 
   errorAutenticacion(error: any){
     if(error.error.statusCode == 401) this.route.navigate(['/login'])
-  }
-  agregarProfesorArray() {
-    console.log('Hola')
-    if (this.selectedProfesor && this.selectedTipoProfesor) {
-      const index = this.profesoresAgregados.findIndex(profe => this.selectedTipoProfesor == profe.tipoProfesor)
-      if(index != -1 ) return this.messageService.add({key: 'bc', severity:'error', summary: 'Error', detail: `Ya hay un profesor ${this.selectedTipoProfesor}`});
-      const indexProfe = this.profesoresAgregados.findIndex(profe => profe.profesor._id == this.selectedProfesor?._id)
-
-      if(indexProfe != -1 ) return this.messageService.add({key: 'bc', severity:'error', summary: 'Error', detail: `El profesor: ${this.selectedProfesor?.nombre} ${this.selectedProfesor?.apellido} ya está agregado en la lista`});
-      console.log('Profe: ', this.profesoresAgregados)
-      this.profesoresAgregados.push({
-        profesor: this.selectedProfesor,
-        tipoProfesor: this.selectedTipoProfesor,
-      });
-
-      // Reiniciar los campos
-      this.selectedProfesor = undefined;
-      this.selectedTipoProfesor = ETipoProfesor.titular;
-    }
-  }
-
-  editarProfesorArray(){
-    console.log('Selected profe: ', this.selectedProfesor)
-    const index = this.profesoresAgregados.findIndex(profe => this.selectedTipoProfesor == profe.tipoProfesor)
-    if(index != -1 ) return this.messageService.add({key: 'bc', severity:'error', summary: 'Error', detail: `Ya hay un profesor ${this.selectedTipoProfesor}`});
-    const indexProfe = this.profesoresAgregados.findIndex(profe => profe.profesor._id == this.selectedProfesor?._id)
-    console.log('Index: ', indexProfe)
-    this.profesoresAgregados[indexProfe].tipoProfesor = this.selectedTipoProfesor;
   }
 
   buscarHorario(id: string): Promise<[]>{
@@ -777,60 +526,11 @@ export class CalendarComponent implements OnInit, AfterViewInit {
         },
         error: error => {
           reject(error)
+          me.loading = false;
         },
         complete: () => me.loading = false
       })
     })
-  }
-
-  eliminarProfesor(index: number) {
-    if(this.selectedFiltro.key == 2){
-      console.log('Profe: ', this.selectedProfesor)
-      if(this.selectedProfesor?._id === this.profesoresAgregados[index].profesor._id){
-        return this.messageService.add({key: 'bc', severity:'error', summary: 'Error', detail: `El profesor: ${this.selectedProfesor?.nombre} ${this.selectedProfesor?.apellido} no se puede eliminar`});
-      }else{
-        this.profesoresAgregados.splice(index, 1);
-      }
-    }else{
-      this.profesoresAgregados.splice(index, 1);
-    }
-  }
-  eliminarHorario(){
-    const me = this;
-    me.loading = true;
-    me.dataService.deleteHorario(me.horarioAAsignar._id || '').subscribe( {
-      next: value => {
-        if(value.deletedCount == 1){
-          me.display = false;
-          this.messageService.add({key: 'bc', severity:'success', summary: 'Exito!', detail: `Se ha eliminado el horario`});
-          if(me.selectedFiltro.key == 1)me.cursoChange();
-          if(me.selectedFiltro.key == 2)me.profesorChange();
-        }else{
-          this.messageService.add({key: 'bc', severity:'error', summary: 'Error!', detail: `No se ha podido eliminar el horario`});
-        }
-        console.log('Value: ', value)
-      },
-      error: error => {
-        me.showErrorToast(error.error.message)
-        me.loading = false;
-      },
-      complete: () => me.loading = false
-    } )
-  }
-
-  mostrarConfirmacion() {
-    this.confirmationService.confirm({
-      message: '¿Estás seguro de que deseas eliminar este horario?',
-      accept: () => {
-        // Acción a realizar si el usuario confirma
-        this.eliminarHorario();
-        console.log('Usuario confirmó');
-      },
-      reject: () => {
-        // Acción a realizar si el usuario rechaza
-        console.log('Usuario rechazó');
-      },
-    });
   }
 
   editarNota:boolean = false;
@@ -849,12 +549,12 @@ export class CalendarComponent implements OnInit, AfterViewInit {
 
       },
       error: error => {
-
+        this.showErrorToast(error.error.message)
         this.editarNotas();
         this.loading = false;
       },
       complete: () => {
-        this.messageService.add({key: 'bc', severity:'success', summary: 'Registro exitoso', detail: 'Nota guardada correctamente!'});
+        this.showSuccessToast('Nota guardada correctamente!')
         this.loading = false;
         this.editarNotas();
       }

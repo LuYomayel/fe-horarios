@@ -26,6 +26,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { HeaderComponent } from './header/header.component';
 import { HorarioDialogComponent } from './dialogs/horario-dialog/horario-dialog.component';
 import { SpinnerOverlayComponent } from './spinner-overlay/spinner-overlay.component';
+import { AgregarProfesorDialogComponent } from './dialogs/agregar-profesor-dialog/agregar-profesor-dialog.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -33,7 +34,8 @@ import { SpinnerOverlayComponent } from './spinner-overlay/spinner-overlay.compo
     LoginComponent,
     HeaderComponent,
     HorarioDialogComponent,
-    SpinnerOverlayComponent
+    SpinnerOverlayComponent,
+    AgregarProfesorDialogComponent
   ],
   imports: [
     BrowserModule,
