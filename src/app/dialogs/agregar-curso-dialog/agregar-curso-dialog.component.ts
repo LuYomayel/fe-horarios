@@ -1,29 +1,30 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { CreateProfesoreDto } from '../../interfaces/horarios';
-import { MessageService } from 'primeng/api';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { HorariosService } from 'src/app/services/horarios.service';
+import { MessageService } from 'primeng/api';
+import { CreateCursoDto, CreateProfesoreDto, ETurno } from '../../interfaces/horarios';
+import { HorariosService } from '../../services/horarios.service';
 
 @Component({
-  selector: 'app-agregar-profesor-dialog',
-  templateUrl: './agregar-profesor-dialog.component.html',
-  styleUrls: ['./agregar-profesor-dialog.component.scss']
+  selector: 'app-agregar-curso-dialog',
+  templateUrl: './agregar-curso-dialog.component.html',
+  styleUrls: ['./agregar-curso-dialog.component.scss']
 })
-export class AgregarProfesorDialogComponent implements OnInit {
+export class AgregarCursoDialogComponent {
   @Input() display: boolean = false;
   @Output() displayChange: EventEmitter<boolean> = new EventEmitter();
 
   loading: boolean = false;
 
-  dtoProfesor: CreateProfesoreDto ={
-    nombre: '',
-    apellido: '',
-    cuil: 0,
+  dtoCurso: CreateCursoDto ={
+    anio: 0,
+    division: 0,
+    turno: [ETurno.mañana],
   };
 
+  turnos: ETurno[] = [ETurno.mañana, ETurno.tarde]
+  selectedTurno: ETurno = ETurno.mañana;
   constructor(
     private messageService: MessageService,
-    private route: Router,
     private dataService: HorariosService
   ) { }
 
@@ -32,7 +33,7 @@ export class AgregarProfesorDialogComponent implements OnInit {
 
   closeDialog() {
     this.display = false;
-    this.displayChange.emit(this.display);
+    this.displayChange.emit(false);
   }
 
   showDialog(){
@@ -40,19 +41,14 @@ export class AgregarProfesorDialogComponent implements OnInit {
   }
 
 
-  agregarProfesor(){
+  agregarCurso(){
     const me = this;
-
-    if(!me.esCuilValido(me.dtoProfesor.cuil.toString())){
-      me.showErrorToast('Formato de dni inválido.')
-      return;
-    }
-    if(this.dtoProfesor.apellido != '' && me.dtoProfesor.nombre != ''){
+    if(this.dtoCurso.anio != 0 && me.dtoCurso.division != 0 && me.selectedTurno){
+      me.dtoCurso.turno = [me.selectedTurno];
       me.loading = true;
-      this.dtoProfesor.cuil = this.formatearMask(this.dtoProfesor.cuil.toString())
-      me.dataService.agregarProfesor(me.dtoProfesor).subscribe({
+      me.dataService.agregarCurso(me.dtoCurso).subscribe({
         next: value => {
-          me.displayChange.emit(true);
+          this.displayChange.emit(true);
         },
         error: error => {
           console.log('Error: ', error)
@@ -60,8 +56,9 @@ export class AgregarProfesorDialogComponent implements OnInit {
           me.loading = false;
         },
         complete: () => {
-          me.showSuccessToast('Profesor agregado correctamente.');
+          me.showSuccessToast('Curso agregado correctamente.');
           me.loading = false;
+
         }
       })
       me.display = false;
@@ -70,17 +67,14 @@ export class AgregarProfesorDialogComponent implements OnInit {
     }
   }
 
-  esCuilValido(dni:string) {
+  esDniValido(dni:string) {
     // La expresión regular verifica que el DNI tenga entre 1 y 8 dígito
     const dniRegex = /^\d{10,11}$/;
-    const dniFormateado = this.formatearMask(dni).toString();
+
     // Si el DNI cumple con la expresión regular, es válido
-    return dniRegex.test(dniFormateado);
+    return dniRegex.test(dni);
   }
 
-  formatearMask(cuil: string){
-    return parseInt(cuil.split('-').join(''));
-  }
   showErrorToast(message: string) {
     this.messageService.add({
       key: 'bc',
@@ -98,5 +92,4 @@ export class AgregarProfesorDialogComponent implements OnInit {
       detail: message,
     });
   }
-
 }

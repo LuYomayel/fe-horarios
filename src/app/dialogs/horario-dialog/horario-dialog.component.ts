@@ -28,8 +28,6 @@ export class HorarioDialogComponent implements OnInit {
   @Input() display: boolean = false;
   @Input() tituloHorario: string = '';
   @Output() displayChange: EventEmitter<boolean> = new EventEmitter();
-  @Output() onClose: EventEmitter<void> = new EventEmitter();
-  @Output() onDialogClose: EventEmitter<void> = new EventEmitter();
 
 
   // Añade aquí tus propiedades y métodos relacionados a las materias, profesores, cursos, turnos, etc.
@@ -84,8 +82,7 @@ export class HorarioDialogComponent implements OnInit {
   closeDialog() {
     console.log('Close: ')
     this.display = false;
-    this.displayChange.emit(this.display);
-    this.onClose.emit(); // emitir el evento aquí
+    this.displayChange.emit(false);
   }
 
 
@@ -105,7 +102,8 @@ export class HorarioDialogComponent implements OnInit {
       me.disableCursos = false;
       me.selectedProfesor = horario.profesor;
       me.profesoresAgregados = [{profesor: horario.profesor, tipoProfesor: ETipoProfesor.titular}];
-    }else{
+    }
+    else{
       me.disableCursos = true;
       me.disableProfesor = false;
     }
@@ -199,8 +197,9 @@ export class HorarioDialogComponent implements OnInit {
     me.loading = true;
     me.dataService.asignarHorario(dto).subscribe({
       next: value => {
-        me.display = false;
         console.log('Profesor agregado: ', value)
+        me.displayChange.emit(true);
+        me.display = false;
         // if(me.selectedFiltro.key == 1)me.cursoChange();
         // if(me.selectedFiltro.key == 2)me.profesorChange();
       },
@@ -244,6 +243,7 @@ export class HorarioDialogComponent implements OnInit {
     me.loading = true;
     me.dataService.editarHorario(dto).subscribe({
       next: value => {
+        me.displayChange.emit(true);
         me.display = false;
       },
       error: error => {
@@ -312,6 +312,7 @@ export class HorarioDialogComponent implements OnInit {
       next: value => {
         if(value.deletedCount == 1){
           me.display = false;
+          me.displayChange.emit(true);
           me.showSuccessToast('Se ha eliminado el horario')
         }else{
           me.showErrorToast('No se ha podido eliminar el horario')

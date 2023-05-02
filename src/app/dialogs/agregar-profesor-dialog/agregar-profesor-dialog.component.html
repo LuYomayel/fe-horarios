@@ -14,7 +14,8 @@
 
     <label for="horario" class="block">Cuil:</label>
     <div class="contenedor">
-      <p-inputNumber inputId="dni" [(ngModel)]="dtoProfesor.cuil" class="form-control" name="Cuil"></p-inputNumber>
+      <!-- <p-inputNumber inputId="cuil" [(ngModel)]="dtoProfesor.cuil" class="form-control" name="Cuil"></p-inputNumber> -->
+      <p-inputMask  mask="99-99999999-9" inputId="cuil" [(ngModel)]="dtoProfesor.cuil" class="form-control" name="Cuil"></p-inputMask>
     </div>
 
     <!-- <label for="horario" class="block">Fecha de nacimiento:</label>

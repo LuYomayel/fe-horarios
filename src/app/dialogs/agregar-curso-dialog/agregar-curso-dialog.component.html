@@ -1,0 +1,34 @@
+<p-dialog [(visible)]="display" [modal]="true" [draggable]="false" (onHide)="closeDialog()">
+  <ng-template pTemplate="header">
+    <div class="header-container">
+      <h2>Agregar Curso</h2>
+    </div>
+  </ng-template>
+  <form class="formulario-profesor">
+
+    <label for="horario" class="block">Año:</label>
+    <p-inputNumber id="año" class="form-control" name="año" [max]="6" [maxlength]="1" [(ngModel)]="dtoCurso.anio"></p-inputNumber>
+
+    <label for="horario" class="block">Division:</label>
+    <p-inputNumber id="division" class="form-control" name="division" [max]="10" [maxlength]="1" [(ngModel)]="dtoCurso.division"></p-inputNumber>
+
+    <label for="horario" class="block">Turno:</label>
+    <div class="contenedor">
+      <p-dropdown [options]="turnos" [(ngModel)]="selectedTurno" name="turno"></p-dropdown>
+    </div>
+
+    <!-- <label for="horario" class="block">Fecha de nacimiento:</label>
+    <div class="contenedor">
+      <input class="p-inputtext custom-date-input" type="date" [(ngModel)]="dtoCurso.fechaNacimiento"  name="fechaNacimiento" />
+    </div> -->
+    <!-- <input type="text" pInputText  id="dni" class="form-control" name="dni" [(ngModel)]="dtoCurso.dni" required> -->
+
+    <div style="margin-top: 1rem;">
+      <p-button (onClick)="agregarCurso()" class="btn btn-primary">Enviar</p-button>
+    </div>
+  </form>
+</p-dialog>
+
+<div *ngIf="loading" class="spinner-overlay">
+  <app-spinner-overlay [loading]="loading"></app-spinner-overlay>
+</div>

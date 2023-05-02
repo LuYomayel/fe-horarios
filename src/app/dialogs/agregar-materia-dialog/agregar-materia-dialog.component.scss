@@ -1,0 +1,35 @@
+:host{
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+  }
+  .formulario-profesor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .formulario-profesor label {
+    align-self: flex-start;
+  }
+  .formulario-profesor{
+    width: 500px;
+  }
+  .contenedor{
+    width: 100%;
+  }
+
+}
+
+:host ::ng-deep{
+  .p-dialog-header{
+    padding: 0 1rem;
+  }
+  .p-inputtext {
+    width: 100%;
+  }
+  p-inputnumber, .p-inputnumber{
+    width: 100%;
+  }
+}
