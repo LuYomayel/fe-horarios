@@ -26,6 +26,7 @@ export interface Curso  {
   division: number;
   turno: ETurno[];
   notas?: string;
+  __v?: string
 }
 
 // export interface Horario  {
@@ -45,8 +46,7 @@ export interface Profesor  {
   _id: string;
   nombre: string;
   apellido: string;
-  dni: number;
-  fechaNacimiento: Date;
+  cuil: number;
 }
 
 export interface HorarioXCurso {
@@ -93,8 +93,28 @@ export interface CreateProfesoreDto {
   cuil: number;
 }
 
+export interface CreateCursoDto{
+  anio: number;
+  division: number;
+  turno: ETurno[];
+}
+
+export interface CreateMateriaDto{
+  nombre: string;
+}
+
 export interface UpdateCursoDto{
-  notas: string;
+  notas?: string;
+  anio?: number;
+  division?: number;
+  turno?: ETurno[];
+}
+
+export interface UpdateProfesorDto extends CreateProfesoreDto{
+}
+
+export interface UpdateMateriaDTO{
+  nombre:string;
 }
 
 export enum ERoles {

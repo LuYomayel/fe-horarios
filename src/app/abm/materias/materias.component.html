@@ -1,1 +1,46 @@
-<p>materias works!</p>
+<div class="container">
+  <div class="titulo">
+    <h1>Materias</h1>
+    <button pButton pRipple type="button" icon="pi pi-plus" class="p-button-rounded p-button-success p-button-outlined" title="Agregar Curso" (click)="showagregarProfesorDialog()"></button>
+  </div>
+  <p-table [value]="materias" [tableStyle]="{ 'min-width': '20rem' }"
+  [paginator]="true"
+  [rows]="10"
+  [rowsPerPageOptions]="[10, 25, 50]"
+  [scrollable]="true"
+  scrollHeight="30rem"
+  [editingRowKeys]="editingRowKeys">
+    <ng-template pTemplate="header">
+        <tr>
+            <th>Materia</th>
+            <th class="acciones-column">Acciones</th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-materia>
+        <tr [pEditableRow]="materia._id" (click)="onRowDblclick(materia)">
+            <td pEditableColumn>
+              <p-cellEditor>
+                  <ng-template pTemplate="input">
+                      <input [(ngModel)]="materia.nombre" type="text" required pInputText>
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                      {{materia.nombre}}
+                  </ng-template>
+              </p-cellEditor>
+            </td>
+            <!-- <td>{{ materia.nombre }}</td> -->
+            <td class="acciones-column">
+              <p-button icon="pi pi-pencil" *ngIf="editingRowKeys[materia._id]" styleClass="p-button-rounded p-button-success p-button-outlined" (onClick)="editar(materia._id)"></p-button> &nbsp;
+              <p-button icon="pi pi-times-circle" styleClass="p-button-rounded p-button-danger p-button-outlined" (onClick)="mostrarConfirmacion(materia._id)"></p-button>
+            </td>
+        </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+
+<p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle" [breakpoints]="['768px']" [style]="{width: '50vw'}"></p-confirmDialog>
+<app-agregar-materia-dialog #agregarMateriaDialog></app-agregar-materia-dialog>
+<div *ngIf="loading" class="spinner-overlay">
+  <app-spinner-overlay [loading]="loading"></app-spinner-overlay>
+</div>

@@ -1,13 +1,24 @@
-<header>
+<!-- <header>
+  <p-menubar [model]="items"></p-menubar>
   <nav class="navbar">
     <div class="nav-left">
-      <div *ngIf="false">
-        <button class="nav-btn">Horarios</button>
-        <button class="nav-btn">Reportes</button>
+      <div>
+        <button >Horarios</button>
+        <button >Reportes</button>
       </div>
     </div>
     <div class="nav-right">
       <button class="logout-btn" (click)="cerrarSesion()">Cerrar Sesión</button>
     </div>
   </nav>
+</header> -->
+
+<header>
+  <div class="card">
+    <p-menubar [model]="items">
+        <ng-template pTemplate="end">
+            <button class="logout-btn" (click)="cerrarSesion()">Cerrar Sesión</button>
+        </ng-template>
+    </p-menubar>
+  </div>
 </header>

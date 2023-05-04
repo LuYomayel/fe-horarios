@@ -1,0 +1,21 @@
+:host{
+  .container{
+    width: 50%;
+    margin: 0 auto;
+    h1{
+      text-align: center;
+    }
+    .acciones-column{
+      width: 10rem;
+    }
+    .titulo{
+      display: flex;
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      h1{
+        padding-right: 1rem;
+      }
+    }
+  }
+}

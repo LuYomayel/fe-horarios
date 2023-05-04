@@ -1,1 +1,69 @@
-<p>profesores works!</p>
+<div class="container">
+  <div class="titulo">
+    <h1>Profesores</h1>
+    <button pButton pRipple type="button" icon="pi pi-plus" class="p-button-rounded p-button-success p-button-outlined" title="Agregar Profesor" (click)="showagregarProfesorDialog()"></button>
+  </div>
+  <p-table [value]="profesores" [tableStyle]="{ 'min-width': '20rem' }"
+  [paginator]="true"
+  [rows]="10"
+  [rowsPerPageOptions]="[10, 25, 50]"
+  [scrollable]="true"
+  scrollHeight="30rem"
+  [editingRowKeys]="editingRowKeys">
+    <ng-template pTemplate="header">
+        <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Cuil</th>
+            <th class="acciones-column">Acciones</th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-profesor>
+        <tr [pEditableRow]="profesor._id" (click)="onRowDblclick(profesor)">
+            <td pEditableColumn>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input [(ngModel)]="profesor.nombre" type="text" required pInputText>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{profesor.nombre}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td pEditableColumn>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input [(ngModel)]="profesor.apellido" type="text" required pInputText>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{profesor.apellido}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td pEditableColumn>
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                      <!-- <p-inputNumber inputId="cuil" [(ngModel)]="profesor.cuil" class="form-control"></p-inputNumber> -->
+                      <p-inputMask  mask="99-99999999-9" inputId="cuil" [(ngModel)]="profesor.cuil" class="form-control" name="Cuil"></p-inputMask>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{profesor.cuil}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td class="acciones-column">
+              <p-button icon="pi pi-pencil" *ngIf="editingRowKeys[profesor._id]" styleClass="p-button-rounded p-button-success p-button-outlined" (onClick)="guardar(profesor._id)"></p-button>
+              <!-- <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-warning p-button-outlined" (onClick)="editar(profesor._id)"></p-button> &nbsp; -->
+              <p-button icon="pi pi-times" styleClass="p-button-rounded p-button-danger p-button-outlined" (onClick)="mostrarConfirmacion(profesor._id)"></p-button>
+            </td>
+        </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<div *ngIf="loading" class="spinner-overlay">
+  <app-spinner-overlay [loading]="loading"></app-spinner-overlay>
+</div>
+
+<app-agregar-profesor-dialog #agregarProfesorDialog ></app-agregar-profesor-dialog>
+<p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle" [breakpoints]="['768px']" [style]="{width: '50vw'}"></p-confirmDialog>

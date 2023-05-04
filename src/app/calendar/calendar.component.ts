@@ -35,7 +35,7 @@ enum EDia {
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
-  providers: [ HorariosService, MessageService, ConfirmationService ]
+  providers: [ HorariosService, ConfirmationService ]
 })
 
 export class CalendarComponent implements OnInit, AfterViewInit {
@@ -85,6 +85,9 @@ export class CalendarComponent implements OnInit, AfterViewInit {
 
         me.dataDialog.arrayProfesores = await me.buscarHorario(me.horarioAAsignar._id || '') || [];
         me.dataDialog._id = me.horarioAAsignar._id;
+        if(me.selectedFiltro.key == 2){
+          me.dataDialog.profesor = me.selectedProfesor;
+        }
       }
 
       me.dataDialog.turno = me.dataDialog.cursos.map(curso => curso.turno)[0][0];
@@ -132,9 +135,8 @@ export class CalendarComponent implements OnInit, AfterViewInit {
     profesor:{
       _id: '',
       apellido: '',
-      dni: 0,
-      nombre: '',
-      fechaNacimiento: new Date()
+      cuil: 0,
+      nombre: ''
     },
     arrayProfesores: []
   };
@@ -165,14 +167,17 @@ export class CalendarComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     const me = this;
-    this.horarioDialog.onClose.subscribe(() => {
-      if(me.selectedFiltro.key == 1)me.cursoChange();
-      if(me.selectedFiltro.key == 2)me.profesorChange();
+    this.horarioDialog.displayChange.subscribe((value) => {
+      if(value){
+        if(me.selectedFiltro.key == 1)me.cursoChange();
+        if(me.selectedFiltro.key == 2)me.profesorChange();
+
+      }
       // Aquí puedes realizar las acciones necesarias cuando el diálogo se cierra
     });
 
-    this.agregarProfesorDialog.displayChange.subscribe( () => {
-      this.profesorChange();
+    this.agregarProfesorDialog.displayChange.subscribe( (value) => {
+      if(value)this.profesorChange();
     })
   }
 
@@ -299,7 +304,6 @@ export class CalendarComponent implements OnInit, AfterViewInit {
       next: (result) => {
         me.profesores = result
         me.selectedProfesor = result[0];
-        me.profesores = me.profesores.sort((a, b) => a.apellido.localeCompare(b.apellido));
       },
       error: error => {
         me.errorAutenticacion(error);
@@ -325,12 +329,7 @@ export class CalendarComponent implements OnInit, AfterViewInit {
       next: result => {
         me.cursos = result;
         // console.log('Cursos: ', result)
-        me.cursos = me.cursos.sort((a, b) => {
-          if (a.anio === b.anio) {
-            return a.division - b.division;
-          }
-          return a.anio - b.anio;
-        });
+
         me.selectedCurso = me.cursos[0];
       },
       error: error => {
@@ -353,6 +352,11 @@ export class CalendarComponent implements OnInit, AfterViewInit {
           me.events = result;
           me.options.eventDisplay = 'block';
           this.cambiarHorarios();
+        },
+        error: error =>{
+          console.log('Error: ', error)
+          // me.showErrorToast(error.error.message)
+          me.loading=false;
         },
         complete: () => me.loading = false
       })
@@ -543,7 +547,7 @@ export class CalendarComponent implements OnInit, AfterViewInit {
     const dto: UpdateCursoDto = {
       notas: this.selectedCurso.notas || ''
     }
-    this.dataService.guardarNota(this.selectedCurso._id, dto).subscribe({
+    this.dataService.editarCurso(this.selectedCurso._id, dto).subscribe({
       next: value => {
         console.log('Value: ', value)
 

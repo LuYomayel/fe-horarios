@@ -5,7 +5,7 @@ import { throwError } from 'rxjs';
 import {map} from 'rxjs/operators';
 import { global } from "./global";
 import { Observable } from "rxjs";
-import { CreateHorarioXCursoDto, CreateProfesoreDto, Curso, EDia, ERoles, ETipoProfesor, ETurno, HorarioXCurso, Materia, Profesor, UpdateCursoDto, UpdateHorarioXCursoDto } from "../interfaces/horarios";
+import { CreateCursoDto, CreateHorarioXCursoDto, CreateMateriaDto, CreateProfesoreDto, Curso, EDia, ERoles, ETipoProfesor, ETurno, HorarioXCurso, Materia, Profesor, UpdateCursoDto, UpdateHorarioXCursoDto, UpdateMateriaDTO, UpdateProfesorDto } from "../interfaces/horarios";
 import { AppComponent } from "../app.component";
 import { CalendarComponent } from "../calendar/calendar.component";
 import jwtDecode from "jwt-decode";
@@ -213,7 +213,10 @@ export class HorariosService{
     getProfesores(): Observable<Profesor[]>{
       return this._http.get<Profesor[]>(`${this.url}profesores`).pipe(
         map(
-            result => result
+            result => {
+              const profesores = result.sort((a, b) => a.apellido.localeCompare(b.apellido));
+              return profesores;
+            }
         )
       )
     }
@@ -221,7 +224,15 @@ export class HorariosService{
     getCursos(): Observable<Curso[]>{
       return this._http.get<Curso[]>(`${this.url}cursos`).pipe(
         map(
-            result => result
+            result => {
+              const cursos = result.sort((a, b) => {
+                if (a.anio === b.anio) {
+                  return a.division - b.division;
+                }
+                return a.anio - b.anio;
+              });
+              return cursos;
+            }
         )
       )
     }
@@ -286,6 +297,29 @@ export class HorariosService{
       )
     }
 
+    agregarCurso(dto: CreateCursoDto):Observable<any>{
+      let json = JSON.stringify(dto);
+      let params = 'json='+json;
+      let headers = new HttpHeaders('application/x-www-form-urlencoded');
+      console.log(json)
+      return this._http.post<any>(`${this.url}cursos`, json, {headers: {"Content-type":"application/json"}}).pipe(
+          map(
+              result => result
+          )
+      )
+    }
+
+    agregarMateria(dto: CreateMateriaDto):Observable<any>{
+      let json = JSON.stringify(dto);
+      let headers = new HttpHeaders('application/x-www-form-urlencoded');
+      console.log(json)
+      return this._http.post<any>(`${this.url}materias`, json, {headers: {"Content-type":"application/json"}}).pipe(
+          map(
+              result => result
+          )
+      )
+    }
+
     login(nombre: string, contrasenia:string):Observable<any>{
       const usuario = {
         nombreUsuario: nombre,
@@ -322,13 +356,55 @@ export class HorariosService{
       )
     }
 
-    guardarNota(id:string, body: UpdateCursoDto ): Observable<any>{
+    editarCurso(id:string, body: UpdateCursoDto ): Observable<any>{
       let json = JSON.stringify(body);
       return this._http.put<any>(`${this.url}cursos/${id}`, body, {headers: {"Content-type":"application/json"}}).pipe(
           map(
               result => result
           )
       )
-  }
+    }
+
+    eliminarCurso(id:string): Observable<any>{
+      return this._http.delete<any>(`${this.url}cursos/${id}`, {headers: {"Content-type":"application/json"}}).pipe(
+          map(
+              result => result
+          )
+      )
+    }
+
+    editarProfesor(id:string, body: UpdateProfesorDto ): Observable<any>{
+      let json = JSON.stringify(body);
+      return this._http.put<any>(`${this.url}profesores/${id}`, body, {headers: {"Content-type":"application/json"}}).pipe(
+          map(
+              result => result
+          )
+      )
+    }
+
+    eliminarProfesor(id:string): Observable<any>{
+      return this._http.delete<any>(`${this.url}profesores/${id}`, {headers: {"Content-type":"application/json"}}).pipe(
+          map(
+              result => result
+          )
+      )
+    }
+
+    editarMateria(id:string, body: UpdateMateriaDTO ): Observable<any>{
+      let json = JSON.stringify(body);
+      return this._http.put<any>(`${this.url}materias/${id}`, body, {headers: {"Content-type":"application/json"}}).pipe(
+          map(
+              result => result
+          )
+      )
+    }
+
+    eliminarMateria(id:string): Observable<any>{
+      return this._http.delete<any>(`${this.url}materias/${id}`, {headers: {"Content-type":"application/json"}}).pipe(
+          map(
+              result => result
+          )
+      )
+    }
 
 }

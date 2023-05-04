@@ -1,30 +1,66 @@
 <div class="container">
-  <h1>Cursos</h1>
+  <div class="titulo">
+    <h1>Cursos</h1>
+    <button pButton pRipple type="button" icon="pi pi-plus" class="p-button-rounded p-button-success p-button-outlined" title="Agregar Curso" (click)="showagregarProfesorDialog()"></button>
+  </div>
   <p-table [value]="cursos" [tableStyle]="{ 'min-width': '20rem' }"
   [paginator]="true"
   [rows]="10"
   [rowsPerPageOptions]="[10, 25, 50]"
   [scrollable]="true"
-  scrollHeight="30rem">
+  scrollHeight="30rem"
+  [editingRowKeys]="editingRowKeys">
     <ng-template pTemplate="header">
-        <tr>
-            <th>Curso</th>
+        <tr >
+            <th>Año</th>
+            <th>División</th>
             <th>Turno</th>
             <th class="acciones-column">Acciones</th>
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-curso>
-        <tr>
-            <td>{{ curso.anio }}° {{ curso.division }}°</td>
-            <td>{{ curso.turno[0] }}</td>
+        <tr [pEditableRow]="curso._id" (click)="onRowDblclick(curso)">
+            <td pEditableColumn>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <p-inputNumber [(ngModel)]="curso.anio" [max]="7"></p-inputNumber>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{ curso.anio }}°
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td pEditableColumn>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <p-inputNumber [(ngModel)]="curso.division" [max]="10"></p-inputNumber>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{ curso.division }}°
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td pEditableColumn>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <p-dropdown [options]="turnos" [(ngModel)]="curso.turno[0]"></p-dropdown>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{ curso.turno[0] }}
+                </ng-template>
+              </p-cellEditor>
+            </td>
             <td class="acciones-column">
-              <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-warning p-button-outlined" (onClick)="editar(curso._id)"></p-button> &nbsp;
-              <p-button icon="pi pi-times-circle" styleClass="p-button-rounded p-button-danger p-button-outlined" (onClick)="eliminar(curso._id)"></p-button>
+              <p-button icon="pi pi-pencil" *ngIf="editingRowKeys[curso._id]" styleClass="p-button-rounded p-button-success p-button-outlined"  (onClick)="editar(curso._id)"></p-button> &nbsp;
+              <p-button icon="pi pi-times-circle" styleClass="p-button-rounded p-button-danger p-button-outlined" (onClick)="mostrarConfirmacion(curso._id)"></p-button>
             </td>
         </tr>
     </ng-template>
   </p-table>
 </div>
+
+<p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle" [breakpoints]="['768px']" [style]="{width: '50vw'}"></p-confirmDialog>
+<app-agregar-curso-dialog #agregarCursoDialog></app-agregar-curso-dialog>
 <div *ngIf="loading" class="spinner-overlay">
   <app-spinner-overlay [loading]="loading"></app-spinner-overlay>
 </div>

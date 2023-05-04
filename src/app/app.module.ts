@@ -23,10 +23,20 @@ import {CalendarModule} from 'primeng/calendar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AvatarModule } from 'primeng/avatar';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { MenuModule } from 'primeng/menu';
+import { MenubarModule } from 'primeng/menubar';
+import { InputMaskModule } from 'primeng/inputmask';
+
 import { HeaderComponent } from './header/header.component';
 import { HorarioDialogComponent } from './dialogs/horario-dialog/horario-dialog.component';
 import { SpinnerOverlayComponent } from './spinner-overlay/spinner-overlay.component';
 import { AgregarProfesorDialogComponent } from './dialogs/agregar-profesor-dialog/agregar-profesor-dialog.component';
+import { ProfesoresComponent } from './abm/profesores/profesores.component';
+import { MateriasComponent } from './abm/materias/materias.component';
+import { CursosComponent } from './abm/cursos/cursos.component';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { AgregarCursoDialogComponent } from './dialogs/agregar-curso-dialog/agregar-curso-dialog.component';
+import { AgregarMateriaDialogComponent } from './dialogs/agregar-materia-dialog/agregar-materia-dialog.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -35,7 +45,12 @@ import { AgregarProfesorDialogComponent } from './dialogs/agregar-profesor-dialo
     HeaderComponent,
     HorarioDialogComponent,
     SpinnerOverlayComponent,
-    AgregarProfesorDialogComponent
+    AgregarProfesorDialogComponent,
+    ProfesoresComponent,
+    MateriasComponent,
+    CursosComponent,
+    AgregarCursoDialogComponent,
+    AgregarMateriaDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -55,7 +70,10 @@ import { AgregarProfesorDialogComponent } from './dialogs/agregar-profesor-dialo
     CalendarModule,
     ProgressSpinnerModule,
     AvatarModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    MenuModule,
+    MenubarModule,
+    InputMaskModule
   ],
   providers: [
     AppComponent,
@@ -64,6 +82,8 @@ import { AgregarProfesorDialogComponent } from './dialogs/agregar-profesor-dialo
       useClass: HttpInterceptorService,
       multi: true,
     },
+    MessageService,
+    ConfirmationService
   ],
   bootstrap: [AppComponent]
 })
