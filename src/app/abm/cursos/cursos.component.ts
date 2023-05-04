@@ -80,31 +80,17 @@ export class CursosComponent implements OnInit, AfterViewInit {
   @ViewChild('agregarCursoDialog') agregarCursoDialog!: AgregarCursoDialogComponent;
 
   showagregarProfesorDialog(){
-    this.agregarCursoDialog.showDialog();
+    this.agregarCursoDialog.showDialog(undefined);
   }
 
   editar(id:string){
     const curso = this.cursos.find(curso => curso._id == id);
+
     if(!curso) return;
-    const { _id, __v, ...body } = curso;
-    body.notas = '';
-    this.loading = true;
-    this.horariosService.editarCurso(id, body).subscribe({
-      next: value => {
+    const { __v, ...body } = curso;
 
-      },
-      error: error => {
-        console.log('Error: ', error);
-        this.showErrorToast(error.error.message)
-        this.loading = false;
-      },
-      complete: () => {
-
-        this.showSuccessToast('Curso cambiado correctamente')
-        this.cargarCursos();
-      }
-    })
-    console.log(id)
+    this.agregarCursoDialog.showDialog(body);
+    return;
   }
 
   eliminar(id:string){

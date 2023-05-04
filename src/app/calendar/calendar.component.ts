@@ -53,7 +53,7 @@ export class CalendarComponent implements OnInit, AfterViewInit {
   @ViewChild('agregarProfesorDialog') agregarProfesorDialog!: AgregarProfesorDialogComponent;
 
   showagregarProfesorDialog(){
-    this.agregarProfesorDialog.showDialog();
+    this.agregarProfesorDialog.showDialog(undefined);
   }
   async showDialog(modulo: number, diaSemana: EDia, accion:string) {
     const me = this;
@@ -65,34 +65,34 @@ export class CalendarComponent implements OnInit, AfterViewInit {
       me.dataDialog.dia = diaSemana;
 
       me.dataDialog.cursos = [];
-      const curso = me.cursos.find( curso => curso._id == me.horarioAAsignar.curso?._id);
+      const curso = me.cursos.find( curso => curso._id == me.cursoId);
       if(curso){
         me.dataDialog.cursos.push(curso);
       }else{
         me.dataDialog.cursos.push(me.selectedCurso);
       }
-      console.log('Filtro: ', me.selectedFiltro)
-      // console.log('CURSO CALENDAR: ', me.dataDialog.cursos)
+      // console.log('Filtro: ', me.selectedFiltro)
+      console.log('CURSO CALENDAR: ', me.dataDialog.cursos)
+      console.log('CURSO horario asignar: ', me.horarioAAsignar.curso?._id, me.horarioAAsignar.curso)
       me.dataDialog.arrayProfesores = []
       me.dataDialog.profesor = undefined;
       if(accion == 'AGREGAR' && me.selectedFiltro.key == 2){
         me.dataDialog.profesor = me.selectedProfesor;
-
         me.dataDialog.cursos = me.cursos.filter(curso => curso.turno.includes(me.selectedFiltroTurno))
       }
       else if(accion == 'EDITAR'){
         me.tituloHorario = 'Editar Horario';
 
         me.dataDialog.arrayProfesores = await me.buscarHorario(me.horarioAAsignar._id || '') || [];
+
         me.dataDialog._id = me.horarioAAsignar._id;
         if(me.selectedFiltro.key == 2){
           me.dataDialog.profesor = me.selectedProfesor;
         }
       }
-
       me.dataDialog.turno = me.dataDialog.cursos.map(curso => curso.turno)[0][0];
       if(me.dataDialog.turno == ETurno.tarde && me.dataDialog.modulo == 6) me.dataDialog.turno = ETurno.prehora;
-      console.log('Data: ', me.dataDialog.profesor)
+
       me.horarioDialog.showDialog(me.dataDialog);
       me.loading=false;
     }else{
@@ -140,6 +140,8 @@ export class CalendarComponent implements OnInit, AfterViewInit {
     },
     arrayProfesores: []
   };
+
+  cursoId: string = '';
   tituloHorario: string = '';
   events: any[] = [];
   options!: CalendarOptions;
@@ -167,12 +169,10 @@ export class CalendarComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     const me = this;
-    this.horarioDialog.displayChange.subscribe((value) => {
-      if(value){
-        if(me.selectedFiltro.key == 1)me.cursoChange();
-        if(me.selectedFiltro.key == 2)me.profesorChange();
 
-      }
+    this.horarioDialog.displayChange.subscribe(() => {
+      if(me.selectedFiltro.key == 1)me.cursoChange();
+      if(me.selectedFiltro.key == 2)me.profesorChange();
       // Aquí puedes realizar las acciones necesarias cuando el diálogo se cierra
     });
 
@@ -245,7 +245,8 @@ export class CalendarComponent implements OnInit, AfterViewInit {
         const nroDia = new Date(info.dateStr).getUTCDate()
         const hora = new Date(info.dateStr).getUTCHours()
         const modulo = this.getNroModulo(hora);
-        const diaSemana = me.dataService.getDia(nroDia)
+        const diaSemana = me.dataService.getDia(nroDia);
+        me.cursoId = me.selectedCurso._id;
         this.showDialog(modulo, diaSemana, 'AGREGAR')
 
       },
@@ -253,23 +254,25 @@ export class CalendarComponent implements OnInit, AfterViewInit {
       eventClick: (info) =>  {
         const nroDia = new Date(info.event.start || '').getUTCDate()
         const hora = new Date(info.event.start || '').getUTCHours()
-        console.log('Title: ', info.event.title);
+        // console.log('Title: ', info.event.title);
         me.dataDialog.materia = info.event.title;
         const modulo = this.getNroModulo(hora);
         const profesor = info.event.extendedProps['description'].split(' ');
         me.horarioAAsignar._id = info.event.extendedProps['id_horario'];
-        if(me.horarioAAsignar.curso)me.horarioAAsignar.curso._id = info.event.extendedProps['curso'];
-        const profeEncontrado = this.profesores.find(profe => {
-          if(!profe.nombre){
-            if(!profe.apellido) return false;
-            else {
-              return profe.apellido.includes(profesor[profesor.length - 1])
-            }
-          }
-          return profe.nombre.includes(profesor[1]) && profe.apellido.includes(profesor[profesor.length - 1])
-        });
-        this.selectedProfesor = profeEncontrado;
 
+        me.cursoId = info.event.extendedProps['curso'];
+        // const profeEncontrado = this.profesores.find(profe => {
+        //   if(!profe.nombre){
+        //     if(!profe.apellido) return false;
+        //     else {
+        //       return profe.apellido.includes(profesor[profesor.length - 1])
+        //     }
+        //   }
+        //   console.log('Hola: ',profesor[1] ,profesor[profesor.length - 1])
+        //   return profe.nombre.includes(profesor[1]) && profe.apellido.includes(profesor[profesor.length - 1])
+        // });
+        // this.selectedProfesor = profeEncontrado;
+        // console.log('Event profe: ',  info.event.extendedProps['description'])
         const diaSemana = me.dataService.getDia(nroDia)
         this.showDialog(modulo, diaSemana, 'EDITAR')
       },

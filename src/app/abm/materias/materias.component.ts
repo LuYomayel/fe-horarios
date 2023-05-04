@@ -78,13 +78,15 @@ export class MateriasComponent implements AfterViewInit {
   @ViewChild('agregarMateriaDialog') agregarMateriaDialog!: AgregarMateriaDialogComponent;
 
   showagregarProfesorDialog(){
-    this.agregarMateriaDialog.showDialog();
+    this.agregarMateriaDialog.showDialog(undefined);
   }
 
   editar(id:string){
     const materia = this.materias.find(mate => mate._id == id);
     if(!materia) return;
     const { _id, ...body } = materia;
+    this.agregarMateriaDialog.showDialog(materia);
+    return;
     this.loading = true;
     this.horariosService.editarMateria(id, body).subscribe({
       next: value => {

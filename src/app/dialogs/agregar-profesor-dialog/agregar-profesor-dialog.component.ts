@@ -1,8 +1,9 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { CreateProfesoreDto } from '../../interfaces/horarios';
+import { CreateProfesoreDto, Profesor } from '../../interfaces/horarios';
 import { MessageService } from 'primeng/api';
 import { Router } from '@angular/router';
 import { HorariosService } from 'src/app/services/horarios.service';
+
 
 @Component({
   selector: 'app-agregar-profesor-dialog',
@@ -15,7 +16,10 @@ export class AgregarProfesorDialogComponent implements OnInit {
 
   loading: boolean = false;
 
-  dtoProfesor: CreateProfesoreDto ={
+  titulo:string = '';
+
+  dtoProfesor: Profesor ={
+    _id: '',
     nombre: '',
     apellido: '',
     cuil: 0,
@@ -35,8 +39,24 @@ export class AgregarProfesorDialogComponent implements OnInit {
     this.displayChange.emit(this.display);
   }
 
-  showDialog(){
+  // showDialog(){
+  //   this.display = true;
+  // }
+
+  showDialog(profesor: (Profesor | undefined) ){
     this.display = true;
+    this.titulo = 'Agregar profesor';
+    this.dtoProfesor = {
+      _id: '',
+      nombre: '',
+      apellido: '',
+      cuil: 0,
+    }
+
+    if(profesor) {
+      this.dtoProfesor = profesor;
+      this.titulo = 'Editar profesor'
+    }
   }
 
 
@@ -49,21 +69,47 @@ export class AgregarProfesorDialogComponent implements OnInit {
     }
     if(this.dtoProfesor.apellido != '' && me.dtoProfesor.nombre != ''){
       me.loading = true;
-      this.dtoProfesor.cuil = this.formatearMask(this.dtoProfesor.cuil.toString())
-      me.dataService.agregarProfesor(me.dtoProfesor).subscribe({
-        next: value => {
-          me.displayChange.emit(true);
-        },
-        error: error => {
-          console.log('Error: ', error)
-          me.showErrorToast(error.error.message)
-          me.loading = false;
-        },
-        complete: () => {
-          me.showSuccessToast('Profesor agregado correctamente.');
-          me.loading = false;
-        }
-      })
+      if(this.dtoProfesor.cuil) this.dtoProfesor.cuil = this.formatearMask(this.dtoProfesor.cuil.toString())
+      if(this.titulo == 'Agregar profesor'){
+        // this.dtoProfesor.cuil = this.formatearMask(this.dtoProfesor.cuil.toString())
+        me.dataService.agregarProfesor(me.dtoProfesor).subscribe({
+          next: value => {
+            me.displayChange.emit(true);
+          },
+          error: error => {
+            console.log('Error: ', error)
+            me.showErrorToast(error.error.message)
+            me.loading = false;
+          },
+          complete: () => {
+            me.showSuccessToast('Profesor agregado correctamente.');
+            me.loading = false;
+          }
+        })
+      }else{
+        const {_id, ...body} = me.dtoProfesor;
+
+        this.dataService.editarProfesor(_id, body).subscribe({
+          next: value => {
+            console.log('Value: ', value)
+          },
+          error: error => {
+            console.log('Error: ', error);
+
+            const mensaje = error.error.message.join(', ')
+            console.log('mensaje: ', mensaje);
+            this.showErrorToast(mensaje)
+            this.loading = false;
+          },
+          complete: () => {
+
+            this.loading = false;
+            this.showSuccessToast('Profesor modificado correctamente')
+            me.displayChange.emit(true);
+          }
+        })
+      }
+
       me.display = false;
     }else{
       me.showErrorToast('Se deben completar todos los campos.')

@@ -78,17 +78,29 @@ export class ProfesoresComponent implements OnInit, AfterViewInit {
   @ViewChild('agregarProfesorDialog') agregarProfesorDialog!: AgregarProfesorDialogComponent;
 
   showagregarProfesorDialog(){
-    this.agregarProfesorDialog.showDialog();
+    this.agregarProfesorDialog.showDialog(undefined);
   }
 
-  guardar(id:string){
+  editarProfesor(id:string){
     const indexProfesor = this.profesores.findIndex(profe => profe._id == id);
     console.log('ID:', id, indexProfesor)
     if(indexProfesor == -1) return;
     this.editingRowKeys[id] = false;
     const { _id, ...body } = this.profesores[indexProfesor];
-    const cuil = parseInt(body.cuil.toString().split('-').join(''));
-    body.cuil = cuil;
+    let cuil = 0;
+    if(body.cuil){
+      cuil = parseInt(body.cuil.toString().split('-').join(''));
+    }
+    const profe: Profesor = {
+      nombre: body.nombre,
+      apellido: body.apellido,
+      cuil,
+      _id: id
+    }
+    console.log('Body: ', profe);
+    this.agregarProfesorDialog.showDialog(profe);
+    return;
+
     this.loading = true;
     this.horariosService.editarProfesor(id, body).subscribe({
       next: value => {
@@ -112,9 +124,9 @@ export class ProfesoresComponent implements OnInit, AfterViewInit {
   }
 
   eliminar(id:string){
-    const curso = this.profesores.find(curso => curso._id == id);
-    if(!curso) return;
-    const { _id, ...body } = curso;
+    const profesor = this.profesores.find(curso => curso._id == id);
+    if(!profesor) return;
+    const { _id, ...body } = profesor;
     this.loading = true;
     this.horariosService.eliminarProfesor(id).subscribe({
       next: value => {

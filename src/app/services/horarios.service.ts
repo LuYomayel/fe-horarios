@@ -169,15 +169,23 @@ export class HorariosService{
                   const objHorario = this.getHorario((horarioAsignado.modulo || -1), (horarioAsignado.curso?.turno[0] || ETurno.noche))
 
                   const profesorIndex = horarioAsignado.arrayProfesores.findIndex(array => array.profesor._id == profesor._id)
+                  const arrayNombresProfes = horarioAsignado.arrayProfesores.map( profe => {
+                    return `${this.getTipoProfesor(profe.tipoProfesor)}: ${profe.profesor.nombre || ''} ${profe.profesor.apellido}`
+                  })
+                  const nombresProfes = arrayNombresProfes.join('<br>')
 
-                  let colorEvento = '';
-                  let tipoProfesor = ETipoProfesor.titular;
-                  if(profesorIndex != -1){
-                    tipoProfesor = horarioAsignado.arrayProfesores[profesorIndex].tipoProfesor
-                    colorEvento = this.getColorEvento(tipoProfesor);
-                  }
+                  // let colorEvento = '';
+                  // let tipoProfesor = ETipoProfesor.titular;
+                  // if(profesorIndex != -1){
+                  //   tipoProfesor = horarioAsignado.arrayProfesores[profesorIndex].tipoProfesor
+                  //   colorEvento = this.getColorEvento(tipoProfesor);
+                  // }
+
+                  const tipoProfesor = horarioAsignado.arrayProfesores[profesorIndex].tipoProfesor
+                  const colorEvento = this.getColorEvento(tipoProfesor);
+
                   const tipo = this.getTipoProfesor(tipoProfesor);
-                  const profesorNombre = profesor ? `${tipo}: ${profesor.nombre} ${profesor.apellido}` : '';
+                  // const profesorNombre = profesor ? `${tipo}: ${profesor.nombre} ${profesor.apellido}` : '';
                   // console.log('Horario: ', horarioAsignado.curso)
                   return {
                     title: horarioAsignado.materia?.nombre,
@@ -185,7 +193,7 @@ export class HorariosService{
                     end: `2023-05-0${this.getNroDia(dia)}T${objHorario.end}:00`,
                     borderColor: 'white',
                     textColor: 'black',
-                    description: profesorNombre,
+                    description: nombresProfes,
                     backgroundColor: colorEvento,
                     extendedProps: {
                       descripcion: `${tipoProfesor}`,

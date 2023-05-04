@@ -1,27 +1,28 @@
 <div class="calendar">
   <div class="calendar-title">
-    Calendario 2023
+    Horarios 2023
   </div>
 </div>
 <div class="container">
   <div class="left-column">
     <div class="alinear">
         <!-- <div class="contenedor"> -->
-          <p-dropdown [options]="optionsFiltro" [(ngModel)]="selectedFiltro" (ngModelChange)="filtroChange($event)" [ngClass]="{'ancho':selectedFiltro?.key==2, 'ancho2': selectedFiltro?.key==1}"></p-dropdown>
+          <!-- <p-dropdown [options]="optionsFiltro" [(ngModel)]="selectedFiltro" (ngModelChange)="filtroChange($event)" [ngClass]="{'ancho':selectedFiltro?.key==2, 'ancho2': selectedFiltro?.key==1}"></p-dropdown> -->
+          <p-dropdown [options]="optionsFiltro" [(ngModel)]="selectedFiltro" (ngModelChange)="filtroChange($event)" class="ancho2"></p-dropdown>
 
-            <button *ngIf="selectedFiltro?.key == 2" pButton pRipple type="button" icon="pi pi-plus" class="p-button-rounded p-button-success p-button-outlined" title="Agregar Profesor" (click)="showagregarProfesorDialog()"></button>
+          <!-- <button *ngIf="selectedFiltro?.key == 2" pButton pRipple type="button" icon="pi pi-plus" class="p-button-rounded p-button-success p-button-outlined" title="Agregar Profesor" (click)="showagregarProfesorDialog()"></button> -->
 
           <!-- </div> -->
     </div>
       <p-listbox *ngIf="selectedFiltro?.key == 2" [options]="profesores" [(ngModel)]="selectedProfesor" (ngModelChange)="profesorChange()" [filter]="true" filterBy="apellido" filterMatchMode="contains" optionLabel="apellido" [listStyle]="{'height':'31.5rem'}">
         <ng-template pTemplate="selectedItem">
           <div  *ngIf="selectedProfesor">
-              <div>{{selectedProfesor.nombre}} {{selectedProfesor.apellido}}</div>
+              <div>{{selectedProfesor.apellido}}, {{selectedProfesor.nombre}} </div>
           </div>
         </ng-template>
         <ng-template let-profesor pTemplate="item">
           <div class="country-item">
-              <div>{{profesor.nombre}} {{profesor.apellido}}</div>
+              <div>{{profesor.apellido}}, {{profesor.nombre}} </div>
           </div>
         </ng-template>
       </p-listbox>
@@ -47,11 +48,14 @@
         </div>
         <div class="columnas" *ngIf="selectedFiltro?.key == 2">
           <p><strong>Profesor:</strong> &nbsp;</p>
-          <p>{{selectedProfesor?.nombre}} {{selectedProfesor?.apellido}}</p>
+          <p>{{selectedProfesor?.apellido}}, {{selectedProfesor?.nombre}} </p>
         </div>
         <div class="columnas" *ngIf="selectedFiltro?.key == 2">
           <p><strong>Turno:</strong> &nbsp;</p>
           <p-dropdown [options]="optionsFiltroTurno" [(ngModel)]="selectedFiltroTurno" (ngModelChange)="filtroTurnoChange($event)" [style]="{'width':'15rem'}" class="mb-2"></p-dropdown>
+        </div>
+        <div class="columnas" *ngIf="selectedFiltro.key == 1">
+          <p-button (onClick)="imprimir()" class="btn btn-primary">Imprimir Horario</p-button>
         </div>
       </div>
     </div>

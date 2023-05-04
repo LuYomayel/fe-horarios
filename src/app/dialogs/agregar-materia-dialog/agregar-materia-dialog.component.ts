@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MessageService } from 'primeng/api';
-import { CreateMateriaDto } from '../../interfaces/horarios';
+import { CreateMateriaDto, Materia } from '../../interfaces/horarios';
 import { HorariosService } from '../../services/horarios.service';
 
 @Component({
@@ -14,10 +14,12 @@ export class AgregarMateriaDialogComponent {
 
   loading: boolean = false;
 
-  dtoMateria: CreateMateriaDto ={
-    nombre: ''
+  dtoMateria: Materia ={
+    nombre: '',
+    _id: ''
   };
 
+  titulo:string = '';
 
   constructor(
     private messageService: MessageService,
@@ -32,8 +34,18 @@ export class AgregarMateriaDialogComponent {
     this.displayChange.emit(false);
   }
 
-  showDialog(){
+  showDialog(materia: (Materia | undefined)){
     this.display = true;
+    this.dtoMateria = {
+      nombre: '',
+      _id: ''
+    }
+    this.titulo = 'Agregar Materia'
+    if(materia){
+      this.dtoMateria = materia;
+      this.titulo = 'Editar Materia'
+    }
+
   }
 
 
@@ -41,21 +53,44 @@ export class AgregarMateriaDialogComponent {
     const me = this;
     if(this.dtoMateria.nombre != ''){
       me.loading = true;
-      me.dataService.agregarMateria(me.dtoMateria).subscribe({
-        next: value => {
-          this.displayChange.emit(true);
-        },
-        error: error => {
-          console.log('Error: ', error)
-          me.showErrorToast(error.error.message)
-          me.loading = false;
-        },
-        complete: () => {
-          me.showSuccessToast('Materia agregada correctamente.');
-          me.loading = false;
+      const {_id, ...body} = me.dtoMateria;
+      if(this.titulo == 'Agregar Materia'){
+        me.dataService.agregarMateria(body).subscribe({
+          next: value => {
+            this.displayChange.emit(true);
+          },
+          error: error => {
+            console.log('Error: ', error)
+            me.showErrorToast(error.error.message)
+            me.loading = false;
+          },
+          complete: () => {
+            me.showSuccessToast('Materia agregada correctamente.');
+            me.loading = false;
 
-        }
-      })
+          }
+        })
+
+      }else{
+
+        this.dataService.editarMateria(_id, body).subscribe({
+          next: value => {
+
+          },
+          error: error => {
+            console.log('Error: ', error);
+            this.showErrorToast(error.error.message)
+            this.loading = false;
+          },
+          complete: () => {
+
+            this.showSuccessToast('Materia modificada correctamente')
+            this.displayChange.emit(true);
+            me.loading = false;
+          }
+        })
+      }
+
       me.display = false;
     }else{
       me.showErrorToast('Se deben completar todos los campos.')

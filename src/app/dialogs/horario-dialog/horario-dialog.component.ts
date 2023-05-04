@@ -80,7 +80,6 @@ export class HorarioDialogComponent implements OnInit {
 
   // Cerrar y abrir dialogo
   closeDialog() {
-    console.log('Close: ')
     this.display = false;
     this.displayChange.emit(false);
   }
@@ -89,8 +88,8 @@ export class HorarioDialogComponent implements OnInit {
   showDialog(horario : DialogHorariosData) {
     const me = this;
     me.loading = false;
-    // console.log('Horario desde hijo: ', horario.turno)
     me.profesoresAgregados = horario.arrayProfesores;
+    console.log('Horario desde hijo: ',  me.profesoresAgregados)
     me.cursosDialog = horario.cursos;
     me.turnoSelected = horario.turno;
     me.selectedDia = horario.dia;
@@ -98,10 +97,12 @@ export class HorarioDialogComponent implements OnInit {
     if(horario.materia) me.selectedMateria = me.materias.filter(result => horario.materia == result.nombre)[0];
     if(horario._id) me._id = horario._id;
     if(horario.profesor) {
+      // console.log('Profesor: ', horario.profesor)
       me.disableProfesor = true;
       me.disableCursos = false;
       me.selectedProfesor = horario.profesor;
-      me.profesoresAgregados = [{profesor: horario.profesor, tipoProfesor: ETipoProfesor.titular}];
+      if(me.profesoresAgregados.length == 0)me.profesoresAgregados = [{profesor: horario.profesor, tipoProfesor: ETipoProfesor.titular}];
+      console.log('Horario desde hijo: ',  me.profesoresAgregados)
     }
     else{
       me.disableCursos = true;

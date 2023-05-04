@@ -18,7 +18,7 @@
     </ng-template>
     <ng-template pTemplate="body" let-materia>
         <tr [pEditableRow]="materia._id" (click)="onRowDblclick(materia)">
-            <td pEditableColumn>
+            <td >
               <p-cellEditor>
                   <ng-template pTemplate="input">
                       <input [(ngModel)]="materia.nombre" type="text" required pInputText>
@@ -30,8 +30,8 @@
             </td>
             <!-- <td>{{ materia.nombre }}</td> -->
             <td class="acciones-column">
-              <p-button icon="pi pi-pencil" *ngIf="editingRowKeys[materia._id]" styleClass="p-button-rounded p-button-success p-button-outlined" (onClick)="editar(materia._id)"></p-button> &nbsp;
-              <p-button icon="pi pi-times-circle" styleClass="p-button-rounded p-button-danger p-button-outlined" (onClick)="mostrarConfirmacion(materia._id)"></p-button>
+              <p-button icon="pi pi-pencil"styleClass="p-button-rounded p-button-success p-button-outlined" (onClick)="editar(materia._id)"></p-button> &nbsp;
+              <p-button icon="pi pi-times" styleClass="p-button-rounded p-button-danger p-button-outlined" (onClick)="mostrarConfirmacion(materia._id)"></p-button>
             </td>
         </tr>
     </ng-template>

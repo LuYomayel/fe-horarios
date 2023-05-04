@@ -20,7 +20,7 @@
     </ng-template>
     <ng-template pTemplate="body" let-profesor>
         <tr [pEditableRow]="profesor._id" (click)="onRowDblclick(profesor)">
-            <td pEditableColumn>
+            <td >
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <input [(ngModel)]="profesor.nombre" type="text" required pInputText>
@@ -30,7 +30,7 @@
                     </ng-template>
                 </p-cellEditor>
             </td>
-            <td pEditableColumn>
+            <td >
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <input [(ngModel)]="profesor.apellido" type="text" required pInputText>
@@ -40,7 +40,7 @@
                     </ng-template>
                 </p-cellEditor>
             </td>
-            <td pEditableColumn>
+            <td >
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                       <!-- <p-inputNumber inputId="cuil" [(ngModel)]="profesor.cuil" class="form-control"></p-inputNumber> -->
@@ -52,7 +52,7 @@
                 </p-cellEditor>
             </td>
             <td class="acciones-column">
-              <p-button icon="pi pi-pencil" *ngIf="editingRowKeys[profesor._id]" styleClass="p-button-rounded p-button-success p-button-outlined" (onClick)="guardar(profesor._id)"></p-button>
+              <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success p-button-outlined" (onClick)="editarProfesor(profesor._id)"></p-button>
               <!-- <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-warning p-button-outlined" (onClick)="editar(profesor._id)"></p-button> &nbsp; -->
               <p-button icon="pi pi-times" styleClass="p-button-rounded p-button-danger p-button-outlined" (onClick)="mostrarConfirmacion(profesor._id)"></p-button>
             </td>

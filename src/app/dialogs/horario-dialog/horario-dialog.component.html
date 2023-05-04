@@ -21,12 +21,12 @@
             <p-dropdown class="fixed-width-dropdown" [disabled]="disableProfesor == true" [options]="profesores" [(ngModel)]="selectedProfesor" name="profesor" [filter]="true" optionLabel="apellido" filterBy="apellido" [showClear]="true">
               <ng-template pTemplate="selectedItem">
                 <div class="country-item country-item-value" *ngIf="selectedProfesor">
-                  <div>{{selectedProfesor.nombre}} {{selectedProfesor.apellido}}</div>
+                  <div>{{selectedProfesor.apellido}}, {{selectedProfesor.nombre}} </div>
                 </div>
               </ng-template>
               <ng-template let-profesor pTemplate="item">
                 <div class="profesor-item">
-                  <div>{{profesor.nombre}} {{profesor.apellido}}</div>
+                  <div>{{profesor.apellido}}, {{profesor.nombre}} </div>
                 </div>
               </ng-template>
             </p-dropdown>
