@@ -26,6 +26,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MenuModule } from 'primeng/menu';
 import { MenubarModule } from 'primeng/menubar';
 import { InputMaskModule } from 'primeng/inputmask';
+import { CardModule } from 'primeng/card';
 
 import { HeaderComponent } from './header/header.component';
 import { HorarioDialogComponent } from './dialogs/horario-dialog/horario-dialog.component';
@@ -37,6 +38,8 @@ import { CursosComponent } from './abm/cursos/cursos.component';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AgregarCursoDialogComponent } from './dialogs/agregar-curso-dialog/agregar-curso-dialog.component';
 import { AgregarMateriaDialogComponent } from './dialogs/agregar-materia-dialog/agregar-materia-dialog.component';
+import { ReportesComponent } from './reportes/reportes.component';
+import { HorariosService } from './services/horarios.service';
 @NgModule({
   declarations: [
     AppComponent,
@@ -50,7 +53,8 @@ import { AgregarMateriaDialogComponent } from './dialogs/agregar-materia-dialog/
     MateriasComponent,
     CursosComponent,
     AgregarCursoDialogComponent,
-    AgregarMateriaDialogComponent
+    AgregarMateriaDialogComponent,
+    ReportesComponent
   ],
   imports: [
     BrowserModule,
@@ -73,7 +77,8 @@ import { AgregarMateriaDialogComponent } from './dialogs/agregar-materia-dialog/
     ConfirmDialogModule,
     MenuModule,
     MenubarModule,
-    InputMaskModule
+    InputMaskModule,
+    CardModule
   ],
   providers: [
     AppComponent,
@@ -83,7 +88,8 @@ import { AgregarMateriaDialogComponent } from './dialogs/agregar-materia-dialog/
       multi: true,
     },
     MessageService,
-    ConfirmationService
+    ConfirmationService,
+    HorariosService
   ],
   bootstrap: [AppComponent]
 })

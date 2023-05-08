@@ -47,7 +47,8 @@ export class HeaderComponent implements OnInit{
         ]
       },
       {
-        label: 'Reportes'
+        label: 'Reportes',
+        routerLink: 'reportes'
       }
 
       ] : [])

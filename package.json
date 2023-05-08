@@ -5,6 +5,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:dev": "ng build --output-path=dist/fe-horarios-dev --base-href /fe-horarios-dev/",
+    "build:prod": "ng build --output-path=dist/fe-horarios --base-href /fe-horarios/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

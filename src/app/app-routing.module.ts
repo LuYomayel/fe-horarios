@@ -6,6 +6,7 @@ import { AuthGuard } from './services/auth-guard';
 import { ProfesoresComponent } from './abm/profesores/profesores.component';
 import { CursosComponent } from './abm/cursos/cursos.component';
 import { MateriasComponent } from './abm/materias/materias.component';
+import { ReportesComponent } from './reportes/reportes.component';
 const routes: Routes = [
   { path: '', component: LoginComponent},
   { path: 'login', component: LoginComponent },
@@ -13,6 +14,7 @@ const routes: Routes = [
   { path: 'profesores', component: ProfesoresComponent, canActivate: [AuthGuard] },
   { path: 'cursos', component: CursosComponent, canActivate: [AuthGuard] },
   { path: 'materias', component: MateriasComponent, canActivate: [AuthGuard] },
+  { path: 'reportes', component: ReportesComponent, canActivate: [AuthGuard] },
 ];
 
 @NgModule({

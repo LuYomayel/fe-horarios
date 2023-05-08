@@ -415,4 +415,12 @@ export class HorariosService{
       )
     }
 
+    sendErrorEmail(error: string){
+      return this._http.post<any>(`${this.url}error`, {errorMessage: error}, {headers: {"Content-type":"application/json"}}).pipe(
+        map(
+            result => result
+        )
+    )
+    }
+
 }
