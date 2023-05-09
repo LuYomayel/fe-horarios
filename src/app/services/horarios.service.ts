@@ -9,6 +9,7 @@ import { CreateCursoDto, CreateHorarioXCursoDto, CreateMateriaDto, CreateProfeso
 import { AppComponent } from "../app.component";
 import { CalendarComponent } from "../calendar/calendar.component";
 import jwtDecode from "jwt-decode";
+
 interface Event {
   title?: string,
   start?: string,
@@ -16,15 +17,20 @@ interface Event {
   description?: string,
 }
 
+import { environment } from '../../environments/environment';
+
+
+
 @Injectable()
 export class HorariosService{
     public url:string;
+    apiUrl = environment.apiUrl;
 
     constructor(
         public _http:HttpClient,
         private appComponent: AppComponent
     ){
-        this.url = global.url
+        this.url = this.apiUrl;
 
     }
 
