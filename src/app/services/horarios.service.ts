@@ -31,7 +31,7 @@ export class HorariosService{
         private appComponent: AppComponent
     ){
         this.url = this.apiUrl;
-
+        console.log('Servicio de horarios listo', this.url);
     }
 
     getNroDia(dia: EDia){
@@ -259,13 +259,19 @@ export class HorariosService{
       )
     }
 
-    verPdf(anio: number, division: number) {
-      return this._http.get(`${this.url}horario-x-curso/descargar-horario/curso/${anio}/${division}`, { responseType: 'blob' }).subscribe((pdfData: Blob) => {
-        const file = new Blob([pdfData], { type: 'application/pdf' });
-        const fileURL = URL.createObjectURL(file);
-        window.open(fileURL, '_blank');
+    verPdf(anio: number, division: number): Promise<void> {
+      return new Promise((resolve, reject) => {
+        this._http.get(`${this.url}horario-x-curso/descargar-horario/curso/${anio}/${division}`, { responseType: 'blob' }).subscribe((pdfData: Blob) => {
+          const file = new Blob([pdfData], { type: 'application/pdf' });
+          const fileURL = URL.createObjectURL(file);
+          window.open(fileURL, '_blank');
+          resolve();
+        }, error => {
+          reject(error);
+        });
       });
     }
+
 
     getIdHorario(id: string): Observable<any>{
       return this._http.get<HorarioXCurso>(`${this.url}horario-x-curso/${id}`).pipe(

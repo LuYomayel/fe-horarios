@@ -59,7 +59,7 @@ export class CalendarComponent implements OnInit, AfterViewInit {
     const me = this;
 
     if(me.roles.includes(ERoles.ADMIN)){
-      // me.loading = true;
+      me.loading = true;
       me.tituloHorario = 'Agregar Horario';
       me.dataDialog.modulo = modulo;
       me.dataDialog.dia = diaSemana;
@@ -170,9 +170,11 @@ export class CalendarComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     const me = this;
 
-    this.horarioDialog.displayChange.subscribe(() => {
-      if(me.selectedFiltro.key == 1)me.cursoChange();
-      if(me.selectedFiltro.key == 2)me.profesorChange();
+    this.horarioDialog.displayChange.subscribe((value) => {
+      if(value){
+        if(me.selectedFiltro.key == 1)me.cursoChange();
+        if(me.selectedFiltro.key == 2)me.profesorChange();
+      }
       // Aquí puedes realizar las acciones necesarias cuando el diálogo se cierra
     });
 
@@ -500,12 +502,18 @@ export class CalendarComponent implements OnInit, AfterViewInit {
   }
 
 
-  async imprimir(){
-    const me = this;
-    me.loading = true;
-    await me.dataService.verPdf(me.selectedCurso.anio, me.selectedCurso.division)
-    me.loading = false;
+  async imprimir() {
+    this.loading = true;
+    try {
+      await this.dataService.verPdf(this.selectedCurso.anio, this.selectedCurso.division);
+    } catch (error) {
+      console.error('Error al obtener el PDF:', error);
+      // Aquí puedes manejar el error, por ejemplo, mostrar un mensaje de error en la interfaz de usuario
+    } finally {
+      this.loading = false;
+    }
   }
+
 
   cerrarSesion(){
     this.loading = true;

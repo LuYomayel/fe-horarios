@@ -64,15 +64,17 @@ export class AgregarProfesorDialogComponent implements OnInit {
     const me = this;
 
     if(!me.esCuilValido(me.dtoProfesor.cuil.toString())){
-      me.showErrorToast('Formato de dni inválido.')
+      me.showErrorToast('Formato de cuil inválido.')
       return;
     }
+    // if(true){
     if(this.dtoProfesor.apellido != '' && me.dtoProfesor.nombre != ''){
       me.loading = true;
       if(this.dtoProfesor.cuil) this.dtoProfesor.cuil = this.formatearMask(this.dtoProfesor.cuil.toString())
       if(this.titulo == 'Agregar profesor'){
         // this.dtoProfesor.cuil = this.formatearMask(this.dtoProfesor.cuil.toString())
-        me.dataService.agregarProfesor(me.dtoProfesor).subscribe({
+        const {_id, ...dto} = me.dtoProfesor;
+        me.dataService.agregarProfesor(dto).subscribe({
           next: value => {
             me.displayChange.emit(true);
           },
