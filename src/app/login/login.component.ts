@@ -42,6 +42,11 @@ export class LoginComponent implements OnInit {
         if(result.access_token){
               this.route.navigate(['/calendario'])
               localStorage.setItem('token', result.access_token);
+              me.dataService.sendInicioSesionEmail(this.nombreUsuario).subscribe({
+                next: result => {
+                  console.log('Valor: ',result)
+                }
+              })
         }
       },
       error: error => {

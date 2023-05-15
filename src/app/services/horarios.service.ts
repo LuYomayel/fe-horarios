@@ -422,7 +422,15 @@ export class HorariosService{
     }
 
     sendErrorEmail(error: string){
-      return this._http.post<any>(`${this.url}error`, {errorMessage: error}, {headers: {"Content-type":"application/json"}}).pipe(
+      return this._http.post<any>(`${this.url}email/error`, {errorMessage: error}, {headers: {"Content-type":"application/json"}}).pipe(
+        map(
+            result => result
+        )
+    )
+    }
+
+    sendInicioSesionEmail(nombreUsuario: string){
+      return this._http.post<any>(`${this.url}email/inicioSesion`, {nombreUsuario}, {headers: {"Content-type":"application/json"}}).pipe(
         map(
             result => result
         )
