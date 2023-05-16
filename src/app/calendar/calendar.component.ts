@@ -514,6 +514,21 @@ export class CalendarComponent implements OnInit, AfterViewInit {
     }
   }
 
+  async imprimirProfesor() {
+    this.loading = true;
+    try {
+      if(!this.selectedProfesor) throw new Error('No se selecciono un profesor');
+      // console.log(this.selectedProfesor?._id, this.selectedFiltroTurno);
+      await this.dataService.verPdfProfesor(this.selectedProfesor?._id, this.selectedFiltroTurno);
+    } catch (error) {
+      this.showErrorToast('Error al obtener el PDF');
+      console.error('Error al obtener el PDF:', error);
+      // Aquí puedes manejar el error, por ejemplo, mostrar un mensaje de error en la interfaz de usuario
+    } finally {
+      this.loading = false;
+    }
+  }
+
 
   cerrarSesion(){
     this.loading = true;

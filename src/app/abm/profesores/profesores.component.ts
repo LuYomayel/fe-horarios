@@ -3,6 +3,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { Profesor } from 'src/app/interfaces/horarios';
 import { HorariosService } from '../../services/horarios.service';
 import { AgregarProfesorDialogComponent } from '../../dialogs/agregar-profesor-dialog/agregar-profesor-dialog.component';
+import { Table } from 'primeng/table';
 
 @Component({
   selector: 'app-profesores',
@@ -178,5 +179,16 @@ export class ProfesoresComponent implements OnInit, AfterViewInit {
         console.log('Usuario rechazó');
       },
     });
+  }
+  @ViewChild('dt1') dt1!: Table;
+  handleInput(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.dt1.filterGlobal(target.value, 'contains');
+  }
+
+
+  imprimirListado(){
+    const me = this;
+    me.horariosService.descargarExcelProfesores();
   }
 }

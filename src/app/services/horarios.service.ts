@@ -272,6 +272,36 @@ export class HorariosService{
       });
     }
 
+    verPdfProfesor(id: string, turno: ETurno): Promise<void> {
+      return new Promise((resolve, reject) => {
+        this._http.get(`${this.url}horario-x-curso/descargar-horario/profesor/${id}/${turno}`, { responseType: 'blob' }).subscribe((pdfData: Blob) => {
+          console.log('PDF: ', pdfData)
+          const file = new Blob([pdfData], { type: 'application/pdf' });
+          const fileURL = URL.createObjectURL(file);
+          window.open(fileURL, '_blank');
+          resolve();
+        }, error => {
+          reject(error);
+        });
+      });
+    }
+
+    descargarExcelProfesores(): Promise<void> {
+      return new Promise((resolve, reject) => {
+        this._http.get(`${this.url}profesores/exportar`, { responseType: 'blob' }).subscribe(
+          (excelData: Blob) => {
+            console.log('Excel: ', excelData)
+            const file = new Blob([excelData], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const fileURL = URL.createObjectURL(file);
+            window.open(fileURL, '_blank');
+            resolve();
+          },
+          error => {
+            reject(error);
+          }
+        );
+      });
+    }
 
     getIdHorario(id: string): Observable<any>{
       return this._http.get<HorarioXCurso>(`${this.url}horario-x-curso/${id}`).pipe(

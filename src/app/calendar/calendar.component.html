@@ -74,9 +74,9 @@
 <app-agregar-profesor-dialog #agregarProfesorDialog ></app-agregar-profesor-dialog>
 
 
-<!-- <div style="margin-top: 1rem;" *ngIf="selectedFiltro.key == 1">
-  <p-button (onClick)="imprimir()" class="btn btn-primary">Imprimir Horario</p-button>
-</div> -->
+<div style="margin-top: 1rem;" *ngIf="selectedFiltro.key == 2">
+  <p-button (onClick)="imprimirProfesor()" class="btn btn-primary">Imprimir Horario</p-button>
+</div>
 
 <div *ngIf="loading" class="spinner-overlay">
   <app-spinner-overlay [loading]="loading"></app-spinner-overlay>
