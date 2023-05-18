@@ -228,7 +228,6 @@ export class HorarioDialogComponent implements OnInit {
     return await new Promise((resolve, reject) => {
       me.dataService.validarHorarioProfesor(_id, idCurso, modulo, dia).subscribe({
         next: value => {
-          console.log('Profesor agregado: ', value)
           resolve(false);
         },
         error: error => {
@@ -239,10 +238,6 @@ export class HorarioDialogComponent implements OnInit {
           }else{
             me.showErrorToast(mensaje)
           }
-          console.log('id: ', _id)
-          console.log('idCurso: ', idCurso)
-          console.log('modulo: ', modulo)
-
           me.loading = false;
           resolve(true);
         },
@@ -257,7 +252,6 @@ export class HorarioDialogComponent implements OnInit {
     return await new Promise((resolve, reject) => {
       me.dataService.validarHorarioCurso(_id, dia, modulo).subscribe({
         next: value => {
-          console.log('Profesor agregado: ', value)
           resolve(false);
         },
         error: error => {

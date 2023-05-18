@@ -97,7 +97,6 @@ export class CursosComponent implements OnInit, AfterViewInit {
     const curso = this.cursos.find(curso => curso._id == id);
     if(!curso) return;
     const { _id, ...body } = curso;
-    return this.showErrorToast('Por el momento no se pueden eliminar cursos.')
     this.loading = true;
     this.horariosService.eliminarCurso(id).subscribe({
       next: value => {
