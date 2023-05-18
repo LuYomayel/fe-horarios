@@ -314,6 +314,23 @@ export class HorariosService{
       });
     }
 
+    descargarExcelTipoProfesor(tipoProfesor: ETipoProfesor): Promise<void> {
+      return new Promise((resolve, reject) => {
+        this._http.get(`${this.url}profesores/exportar/tipoProfesor/${tipoProfesor}`, { responseType: 'blob' }).subscribe(
+          (excelData: Blob) => {
+            console.log('Excel: ', excelData)
+            const file = new Blob([excelData], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const fileURL = URL.createObjectURL(file);
+            window.open(fileURL, '_blank');
+            resolve();
+          },
+          error => {
+            reject(error);
+          }
+        );
+      });
+    }
+
     getIdHorario(id: string): Observable<any>{
       return this._http.get<HorarioXCurso>(`${this.url}horario-x-curso/${id}`).pipe(
         map(

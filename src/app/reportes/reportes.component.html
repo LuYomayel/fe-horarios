@@ -1,6 +1,33 @@
-<div class="container">
-  <p-card>
-    <h2>¡Próximamente!</h2>
-    <p>Estamos trabajando en esta sección. ¡Vuelve pronto!</p>
-  </p-card>
+<div class="pt-2">
+  <div class="container">
+    <p-card >
+      <ng-template pTemplate="header">
+        <h2 class="text-center pt-3">Reportes de profesores</h2>
+      </ng-template>
+      <div class="row">
+        <!-- Reporte: Profesores con horariosxcurso de tipoProfesor Interino -->
+        <div class="col">
+          <p-card header="Situación de revista">
+            <p>Descargar listado de profesores según situación de revista.</p>
+            <div class="row">
+              <div class="col">
+                <p-dropdown [options]="opcionesSituacion" [(ngModel)]="selectedSituacion"></p-dropdown>
+              </div>
+              <div class="col">
+                <p-button label="Generar reporte" (onClick)="generarSituacionReporte()"></p-button>
+              </div>
+            </div>
+          </p-card>
+        </div>
+        <!-- Reporte: Listado de todos los profesores -->
+        <div class="col">
+          <p-card header="Todos los Profesores">
+            <p>Imprimir un listado de todos los profesores.</p>
+            <p-button label="Imprimir Listado" (onClick)="imprimirListadoProfesores()"></p-button>
+          </p-card>
+        </div>
+      </div>
+
+    </p-card>
+  </div>
 </div>

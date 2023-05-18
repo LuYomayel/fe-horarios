@@ -1,9 +1,13 @@
 /* You can add global styles to this file, and also import other style files */
-@use '../node_modules/primeng/resources/themes/saga-green/theme.css';
-@use '../node_modules/primeng/resources/primeng.min.css';
-@use '../node_modules/primeicons/primeicons.css';
+@import '../node_modules/primeng/resources/themes/saga-green/theme.css';
+@import '../node_modules/primeng/resources/primeng.min.css';
+@import '../node_modules/primeicons/primeicons.css';
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+
+/* Tus otros estilos... */
+
+
 
 .fc .fc-timegrid-slot {
   height: 10em; /* Cambia la altura de la celda de día */
@@ -20,6 +24,7 @@ html, body {
 
 
 body{
-  background-color: rgb(204, 194, 194);
+  background-color: rgb(153, 149, 149);
+  color: rgb(153, 149, 149);
   font-family: 'Roboto', sans-serif;
 }

@@ -1,50 +1,5 @@
-.formulario-horario {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 500px;
-}
-
-.alinear{
-  display: inline-flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.ancho{
-  width: 11rem;
-}
-.ancho2{
-  width: 15rem;
-}
-
-
-
-.formulario-profesor {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.formulario-horario .p-inputtext {
-  width: 100%;
-  margin-bottom: 1rem;
-}
-
-.formulario-horario .p-button {
-  width: 100%;
-}
-
-.formulario-horario label {
-  align-self: flex-start;
-}
-
-.formulario-profesor label {
-  align-self: flex-start;
-}
-
-.contenedor{
-  width: 100%;
+.container{
+  margin: 0 auto;
 }
 
 :host ::ng-deep{
@@ -53,11 +8,13 @@
   //   border-bottom: 1px solid black;
   //   // border-radius: 6px;
   // }
+  .p-dropdown{
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
   .dialogo-agregar .p-dialog-header{
     padding: 0 1rem;
-  }
-  .p-dropdown{
-    width: 100%;
   }
   .fc .fc-timegrid-slot {
     height: 6rem; /* Cambia la altura de la celda de día */
@@ -69,11 +26,6 @@
   .fc-timegrid-slot-label {
     height: 1.5em;
     line-height: 1.5em;
-  }
-
-
-  .formulario-profesor{
-    width: 500px;
   }
 
   .p-inputtext {
@@ -109,37 +61,7 @@
   .columnas{
     display: flex;
     flex-direction: row;
-  }
-  .container {
-    display: flex;
-    flex-direction: row;
-    box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.1);
-    background-color: white;
-    padding: 20px;
-    border-radius: 5px;
-    margin: 0 1rem;
-  }
-
-  .left-column {
-    display: flex;
-    flex-direction: column;
-    margin-right: 20px;
-  }
-
-  .title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
-
-  .profesores {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .profesores li {
-    margin-bottom: 5px;
+    align-items: center;
   }
 
   .calendar {
@@ -150,104 +72,6 @@
     font-size: 50px;
     font-weight: bold;
     margin-bottom: 10px;
-  }
-
-  .centrar {
-    display: flex;
-    align-items: center; /* Alinea los elementos verticalmente */
-    justify-content: space-evenly; /* Alinea los elementos horizontalmente */
-  }
-  /* En tu archivo CSS */
-  .custom-date-input::-webkit-calendar-picker-indicator {
-    display: none;
-  }
-
-  .custom-date-input::-moz-calendar-picker-indicator {
-    display: none;
-  }
-
-  .custom-date-input::-ms-calendar-picker-indicator {
-    display: none;
-  }
-
-  .logout-btn {
-    background-color: #ff5c5c;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    outline: none;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.2s ease;
-  }
-
-  .logout-btn:hover {
-    background-color: #ff3f3f;
-  }
-
-  .profesor-tipo-container {
-    display: flex;
-    width: 100%;
-  }
-
-  .profesor-container,
-  .tipo-profesor-container
-  .agregar-container {
-    flex: 1;
-    // padding: 0 0.5rem;
-  }
-
-  .profesor-container{
-    padding-right: 0.5rem;
-  }
-
-  .agregar-container{
-    margin-top: 1.3rem;
-    margin-left: 0.5rem;
-    width: 3rem;
-  }
-  .fixed-width-dropdown {
-    width: 200px !important; /* Ajusta el valor a la anchura deseada */
-  }
-
-  .lista-profesores{
-    text-align: left;
-    width: 100%;
-    // margin-bottom: 0.7rem;
-  }
-  .lista{
-    display: flex;
-    align-items: center;
-    margin: 0;
-    padding: 0;
-    height: 2rem;
-  }
-  .boton-eliminar {
-    background-color: white;
-    border: none;
-    color: #EF4444;
-    cursor: pointer;
-    font-size: 1rem;
-    padding: 0.2rem;
-    margin-left: .5rem;
-    border-radius: 50%;
-    display: flex; /* Añade esta línea para usar Flexbox */
-    justify-content: center; /* Añade esta línea para centrar horizontalmente */
-    align-items: center;
-  }
-
-  .boton-eliminar:hover{
-    border: 2px solid #EF4444;
-  }
-
-  .header-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0;
   }
 
   .flex {

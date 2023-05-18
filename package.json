@@ -26,6 +26,7 @@
     "@fullcalendar/interaction": "^6.1.4",
     "@fullcalendar/timegrid": "^6.1.4",
     "angular-calendar": "^0.31.0",
+    "bootstrap": "^5.3.0-alpha3",
     "jsonwebtoken": "^9.0.0",
     "jwt-decode": "^3.1.2",
     "primeicons": "^6.0.1",

@@ -1,6 +1,14 @@
 :host{
-  .container{
-    width: 50%;
-    margin: 2rem auto;
+  .p-text-center{
+    text-align: center;
+  }
+}
+
+:host ::ng-deep{
+
+  .p-dropdown{
+    display: flex;
+    align-items: center;
+    width: 100%;
   }
 }

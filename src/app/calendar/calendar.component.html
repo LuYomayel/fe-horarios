@@ -1,19 +1,17 @@
 <div class="calendar">
   <div class="calendar-title">
-    Horarios 2023!
+    Horarios 2023
   </div>
 </div>
-<div class="container">
-  <div class="left-column">
-    <div class="alinear">
-        <!-- <div class="contenedor"> -->
-          <!-- <p-dropdown [options]="optionsFiltro" [(ngModel)]="selectedFiltro" (ngModelChange)="filtroChange($event)" [ngClass]="{'ancho':selectedFiltro?.key==2, 'ancho2': selectedFiltro?.key==1}"></p-dropdown> -->
-          <p-dropdown [options]="optionsFiltro" [(ngModel)]="selectedFiltro" (ngModelChange)="filtroChange($event)" class="ancho2"></p-dropdown>
+<div class="container row">
+  <div class="col-3">
+    <!-- <div class="contenedor"> -->
+      <!-- <p-dropdown [options]="optionsFiltro" [(ngModel)]="selectedFiltro" (ngModelChange)="filtroChange($event)" [ngClass]="{'ancho':selectedFiltro?.key==2, 'ancho2': selectedFiltro?.key==1}"></p-dropdown> -->
+      <p-dropdown [options]="optionsFiltro" [(ngModel)]="selectedFiltro" (ngModelChange)="filtroChange($event)" class="drop"></p-dropdown>
 
-          <!-- <button *ngIf="selectedFiltro?.key == 2" pButton pRipple type="button" icon="pi pi-plus" class="p-button-rounded p-button-success p-button-outlined" title="Agregar Profesor" (click)="showagregarProfesorDialog()"></button> -->
+      <!-- <button *ngIf="selectedFiltro?.key == 2" pButton pRipple type="button" icon="pi pi-plus" class="p-button-rounded p-button-success p-button-outlined" title="Agregar Profesor" (click)="showagregarProfesorDialog()"></button> -->
 
-          <!-- </div> -->
-    </div>
+      <!-- </div> -->
       <p-listbox *ngIf="selectedFiltro?.key == 2" [options]="profesores" [(ngModel)]="selectedProfesor" (ngModelChange)="profesorChange()" [filter]="true" filterBy="apellido" filterMatchMode="contains" optionLabel="apellido" [listStyle]="{'height':'31.5rem'}">
         <ng-template pTemplate="selectedItem">
           <div  *ngIf="selectedProfesor">
@@ -26,7 +24,7 @@
           </div>
         </ng-template>
       </p-listbox>
-      <p-listbox *ngIf="selectedFiltro?.key == 1" [options]="cursos" [(ngModel)]="selectedCurso" (ngModelChange)="cursoChange()"  [listStyle]="{'height':'33rem'}" [style]="{'width':'15rem'}">
+      <p-listbox *ngIf="selectedFiltro?.key == 1" [options]="cursos" [(ngModel)]="selectedCurso" (ngModelChange)="cursoChange()"  [listStyle]="{'height':'33rem'}" >
         <ng-template pTemplate="selectedItem">
           <div  *ngIf="selectedCurso">
             <div>{{selectedCurso.anio}}° {{selectedCurso.division}}°</div>
@@ -39,8 +37,7 @@
         </ng-template>
       </p-listbox>
   </div>
-  <div class="contenedor">
-    <div class="contenedor" >
+  <div class="col">
       <div class="helper">
         <div class="columnas" *ngIf="selectedFiltro?.key == 1">
           <p><strong>Curso:</strong> &nbsp;</p>
@@ -55,10 +52,12 @@
           <p-dropdown [options]="optionsFiltroTurno" [(ngModel)]="selectedFiltroTurno" (ngModelChange)="filtroTurnoChange($event)" [style]="{'width':'15rem'}" class="mb-2"></p-dropdown>
         </div>
         <div class="columnas" *ngIf="selectedFiltro.key == 1">
-          <p-button (onClick)="imprimir()" class="btn btn-primary">Imprimir Horario</p-button>
+          <p-button (onClick)="imprimir()" >Imprimir Horario</p-button>
+        </div>
+        <div class="columnas" *ngIf="selectedFiltro.key == 2">
+          <p-button (onClick)="imprimirProfesor()" >Imprimir Horario</p-button>
         </div>
       </div>
-    </div>
     <full-calendar [options]="options" [events]="events"></full-calendar>
     <div *ngIf="selectedFiltro.key == 1" class="flex">
       <label for="horario" class="notas">Notas:</label>
@@ -67,6 +66,7 @@
       <button class="p-button p-button-warning btn" *ngIf="!editarNota" (click)="editarNotas()">Editar</button>
     </div>
   </div>
+
 </div>
 
 <app-horario-dialog #horarioDialog [tituloHorario]="tituloHorario" ></app-horario-dialog>
@@ -74,9 +74,7 @@
 <app-agregar-profesor-dialog #agregarProfesorDialog ></app-agregar-profesor-dialog>
 
 
-<div style="margin-top: 1rem;" *ngIf="selectedFiltro.key == 2">
-  <p-button (onClick)="imprimirProfesor()" class="btn btn-primary">Imprimir Horario</p-button>
-</div>
+
 
 <div *ngIf="loading" class="spinner-overlay">
   <app-spinner-overlay [loading]="loading"></app-spinner-overlay>

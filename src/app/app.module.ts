@@ -27,6 +27,7 @@ import { MenuModule } from 'primeng/menu';
 import { MenubarModule } from 'primeng/menubar';
 import { InputMaskModule } from 'primeng/inputmask';
 import { CardModule } from 'primeng/card';
+import { PanelModule } from 'primeng/panel';
 
 import { HeaderComponent } from './header/header.component';
 import { HorarioDialogComponent } from './dialogs/horario-dialog/horario-dialog.component';
@@ -78,7 +79,8 @@ import { HorariosService } from './services/horarios.service';
     MenuModule,
     MenubarModule,
     InputMaskModule,
-    CardModule
+    CardModule,
+    PanelModule
   ],
   providers: [
     AppComponent,
