@@ -174,7 +174,7 @@ export class HorarioDialogComponent implements OnInit {
   }
 
   // Añade aquí tus métodos como guardarHorario(), editarHorario(), eliminarProfesor(), materiaChange(), profesorChange(), turnoChange(), etc.
-  guardarHorario(){
+  async guardarHorario(){
     const me = this;
     if(!me.validarCampos()) {
 
@@ -196,6 +196,9 @@ export class HorarioDialogComponent implements OnInit {
     console.log('Dto agregar: ', dto)
     // return;
     me.loading = true;
+    const validarProfe = await me.validarHorarioProfesor(arrayProfesores[0].profesor, me.selectedCurso.turno[0], dto.modulo)
+    if(validarProfe) return;
+    console.log('Validar profe: ', validarProfe)
     me.dataService.asignarHorario(dto).subscribe({
       next: value => {
         console.log('Profesor agregado: ', value)
@@ -216,6 +219,31 @@ export class HorarioDialogComponent implements OnInit {
       },
       complete: () => me.loading = false
     })
+  }
+
+  async validarHorarioProfesor(_id: string, turno:ETurno, modulo: number){
+    const me = this;
+    return await new Promise((resolve, reject) => {
+      me.dataService.validarHorarioProfesor(_id, turno, modulo).subscribe({
+        next: value => {
+          console.log('Profesor agregado: ', value)
+          resolve(false);
+        },
+        error: error => {
+          const mensaje = error.error.message;
+          const mensaje2 = error.error.message.error;
+          if(mensaje2 && typeof mensaje2 == 'string'){
+            me.showErrorToast(mensaje2)
+          }else{
+            me.showErrorToast(mensaje)
+          }
+          me.loading = false;
+          resolve(true);
+        },
+        complete: () => me.loading = false
+      })
+    })
+
   }
 
   editarHorario(){
@@ -257,6 +285,26 @@ export class HorarioDialogComponent implements OnInit {
 
   validarCampos(){
     let validado: boolean = true;
+    if(!this.selectedCurso){
+      this.showErrorToast('Debe seleccionar un curso')
+      validado = false;
+    }
+    if(!this.selectedMateria){
+      this.showErrorToast('Debe seleccionar una materia')
+      validado = false;
+    }
+    if(!this.selectedModulo){
+      this.showErrorToast('Debe seleccionar un módulo')
+      validado = false;
+    }
+    if(!this.selectedDia){
+      this.showErrorToast('Debe seleccionar un día')
+      validado = false;
+    }
+    if(this.profesoresAgregados.length == 0){
+      this.showErrorToast('Debe agregar al menos un profesor')
+      validado = false;
+    }
     return validado;
   }
 

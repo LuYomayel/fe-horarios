@@ -311,6 +311,14 @@ export class HorariosService{
       )
     }
 
+    validarHorarioProfesor(idProfesor: string, turno: ETurno, modulo: number): Observable<any>{
+      return this._http.get<any>(`${this.url}profesores/horario-x-cursoExistente/${idProfesor}/${turno}/${modulo}`).pipe(
+        map(
+            result => result
+        )
+      )
+    }
+
     asignarHorario(horarioAAsignar: CreateHorarioXCursoDto):Observable<any>{
         let json = JSON.stringify(horarioAAsignar);
         let params = 'json='+json;
