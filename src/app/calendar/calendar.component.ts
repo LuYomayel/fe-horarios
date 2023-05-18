@@ -375,14 +375,15 @@ export class CalendarComponent implements OnInit, AfterViewInit {
     this.cambiarHorarios();
   }
 
-  profesorChange(){
+  async profesorChange(){
     const me = this;
 
     me.horarioAAsignar.profesor = me.selectedProfesor;
 
     if(me.selectedFiltro.key == 2 && me.selectedProfesor){
       me.loading = true;
-      me.dataService.getHorarioXProfesor(me.selectedProfesor, this.selectedFiltroTurno).subscribe({
+
+      me.dataService.getHorarioXProfesor(me.selectedProfesor, me.selectedFiltroTurno).subscribe({
         next: result => {
           me.events = result;
         },

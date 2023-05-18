@@ -196,8 +196,10 @@ export class HorarioDialogComponent implements OnInit {
     console.log('Dto agregar: ', dto)
     // return;
     me.loading = true;
-    const validarProfe = await me.validarHorarioProfesor(arrayProfesores[0].profesor, me.selectedCurso.turno[0], dto.modulo)
+    const validarProfe = await me.validarHorarioProfesor(arrayProfesores[0].profesor, me.selectedCurso._id, dto.modulo, me.selectedDia)
     if(validarProfe) return;
+    const validarCurso = await me.validarHorarioCurso(me.selectedCurso._id, me.selectedDia, dto.modulo)
+    if(validarCurso) return;
     console.log('Validar profe: ', validarProfe)
     me.dataService.asignarHorario(dto).subscribe({
       next: value => {
@@ -221,10 +223,39 @@ export class HorarioDialogComponent implements OnInit {
     })
   }
 
-  async validarHorarioProfesor(_id: string, turno:ETurno, modulo: number){
+  async validarHorarioProfesor(_id: string, idCurso:string, modulo: number, dia:EDia){
     const me = this;
     return await new Promise((resolve, reject) => {
-      me.dataService.validarHorarioProfesor(_id, turno, modulo).subscribe({
+      me.dataService.validarHorarioProfesor(_id, idCurso, modulo, dia).subscribe({
+        next: value => {
+          console.log('Profesor agregado: ', value)
+          resolve(false);
+        },
+        error: error => {
+          const mensaje = error.error.message;
+          const mensaje2 = error.error.message.error;
+          if(mensaje2 && typeof mensaje2 == 'string'){
+            me.showErrorToast(mensaje2)
+          }else{
+            me.showErrorToast(mensaje)
+          }
+          console.log('id: ', _id)
+          console.log('idCurso: ', idCurso)
+          console.log('modulo: ', modulo)
+
+          me.loading = false;
+          resolve(true);
+        },
+        complete: () => me.loading = false
+      })
+    })
+
+  }
+
+  async validarHorarioCurso(_id: string, dia:EDia, modulo: number){
+    const me = this;
+    return await new Promise((resolve, reject) => {
+      me.dataService.validarHorarioCurso(_id, dia, modulo).subscribe({
         next: value => {
           console.log('Profesor agregado: ', value)
           resolve(false);

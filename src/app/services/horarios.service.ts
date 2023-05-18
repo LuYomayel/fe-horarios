@@ -120,7 +120,7 @@ export class HorariosService{
     }
 
     getHorarioXCurso(anio: number=1, curso:number=1): Observable<Event[]>{
-        return this._http.get<HorarioXCurso[]>(`${this.url}horario-x-curso/curso/${anio}/${curso}`).pipe(
+        return this._http.get<HorarioXCurso[]>(`${this.url}cursos/findByCurso/${anio}/${curso}`).pipe(
             map(
                 result => {
                   const newArray: Event[] = result.map( horarioAsignado => {
@@ -164,8 +164,19 @@ export class HorariosService{
         )
     }
 
+    findByTurno(turno: ETurno): Observable<Curso[]>{
+      return this._http.get<Curso[]>(`${this.url}cursos/findByTurno/${turno}`).pipe(
+        map(
+          result => {
+            console.log('Result: ', result)
+            return result;
+          }
+        )
+      )
+    }
+
     getHorarioXProfesor(profesor: Profesor, turno: ETurno): Observable<Event[]>{
-      return this._http.get<HorarioXCurso[]>(`${this.url}horario-x-curso/profesor/${profesor._id}/${turno}`).pipe(
+      return this._http.get<HorarioXCurso[]>(`${this.url}cursos/findByTurno/${profesor._id}/${turno}`).pipe(
           map(
               result => {
                 const newArray: Event[] = result.map( horarioAsignado => {
@@ -261,7 +272,7 @@ export class HorariosService{
 
     verPdf(anio: number, division: number): Promise<void> {
       return new Promise((resolve, reject) => {
-        this._http.get(`${this.url}horario-x-curso/descargar-horario/curso/${anio}/${division}`, { responseType: 'blob' }).subscribe((pdfData: Blob) => {
+        this._http.get(`${this.url}cursos/descargar-horario/curso/${anio}/${division}`, { responseType: 'blob' }).subscribe((pdfData: Blob) => {
           const file = new Blob([pdfData], { type: 'application/pdf' });
           const fileURL = URL.createObjectURL(file);
           window.open(fileURL, '_blank');
@@ -274,7 +285,7 @@ export class HorariosService{
 
     verPdfProfesor(id: string, turno: ETurno): Promise<void> {
       return new Promise((resolve, reject) => {
-        this._http.get(`${this.url}horario-x-curso/descargar-horario/profesor/${id}/${turno}`, { responseType: 'blob' }).subscribe((pdfData: Blob) => {
+        this._http.get(`${this.url}cursos/descargar-horario/profesor/${id}/${turno}`, { responseType: 'blob' }).subscribe((pdfData: Blob) => {
           console.log('PDF: ', pdfData)
           const file = new Blob([pdfData], { type: 'application/pdf' });
           const fileURL = URL.createObjectURL(file);
@@ -311,8 +322,16 @@ export class HorariosService{
       )
     }
 
-    validarHorarioProfesor(idProfesor: string, turno: ETurno, modulo: number): Observable<any>{
-      return this._http.get<any>(`${this.url}profesores/horario-x-cursoExistente/${idProfesor}/${turno}/${modulo}`).pipe(
+    validarHorarioProfesor(idProfesor: string, idCurso: string, modulo: number, dia:EDia): Observable<any>{
+      return this._http.get<any>(`${this.url}profesores/horario-x-cursoExistente/${idProfesor}/${idCurso}/${modulo}/${dia}`).pipe(
+        map(
+            result => result
+        )
+      )
+    }
+
+    validarHorarioCurso(idCurso: string, dia: EDia, modulo: number): Observable<any>{
+      return this._http.get<any>(`${this.url}cursos/horario-x-cursoExistente/${idCurso}/${dia}/${modulo}`).pipe(
         map(
             result => result
         )
